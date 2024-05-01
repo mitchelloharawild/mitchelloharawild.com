@@ -1,0 +1,22 @@
+---
+title: Mitchell O'Hara-Wild
+about:
+  image: img/square.jpg
+  template: trestles
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/mitchelloharawild/
+    - icon: github
+      text: GitHub
+      href: https://github.com/mitchelloharawild/
+    - icon: mortarboard
+      text: Google Scholar
+      href: https://scholar.google.com/citations?user=NVlC6vMAAAAJ
+    - icon: file-earmark-person
+      text: CV
+      href: http://www.mitchelloharawild.com/#
+    - icon: envelope
+      text: Email
+      href: mailto:mail@mitchelloharawild.com
+---

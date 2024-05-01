@@ -223,17 +223,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="fable-forecasting-with-tables" class="level1">
 <h1>fable: forecasting with tables</h1>
 <p>A major difference between <em>fable</em> and its predecessor <em>forecast</em> is the way in which time series data is stored. A substantial <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">source of confusion</a> for <em>forecast</em> package users is the creation and use of <code>ts</code> objects. The <em>fable</em> package is built upon the <em>tsibble</em> package, which (as the name suggests) is a <code>tibble</code> with time series structure. Among many benefits, the data is now in the same structure provided in most data files. This makes loading time series data into R a breeze (and less error-prone), as the column of data specifying the observation’s measurement time is now actually used in the data! Other benefits of a tabular data structure include integration with non-temporal packages and support for multiple time series with mixed measurement types.</p>
-<div class="row">
-<div class="col-lg-7" style="font-size:110%;">
 <blockquote class="blockquote">
 <p>A fable is never true, but it tells you something important about reality - and that’s what a forecast is.</p>
 <p><em>Rob Hyndman (2018-06-21)</em></p>
-<p>New York Open Statistical Programming Meetup https://youtu.be/yx6OQ-8HofU?t=2484</p>
+<p>New York Open Statistical Programming Meetup (https://youtu.be/yx6OQ-8HofU?t=2484)</p>
 </blockquote>
-</div>
-<div class="col-lg-5">
-<p><img src="fable-nyhackr.png"></p>
-</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fable-nyhackr.png" class="img-fluid figure-img"></p>
+<figcaption>Rob Hyndman introducing fable to the nyhackr group</figcaption>
+</figure>
 </div>
 <p>The fable package has been actively developed over the past two years, and has undergone a couple of substantial revisions to the interface prior to release. Despite these changes the package’s goals have remained constant:</p>
 <ul>
@@ -671,11 +670,12 @@ Model: ETS(A,A,A)
   author = {O’Hara-Wild, Mitchell},
   title = {Introducing Fable},
   date = {2019-09-30},
+  url = {https://mitchelloharawild.github.io/mitchelloharawild.com//blog/fable},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2019" class="csl-entry quarto-appendix-citeas" role="listitem">
 O’Hara-Wild, Mitchell. 2019. <span>“Introducing Fable.”</span> September
-30, 2019.
+30, 2019. <a href="https://mitchelloharawild.github.io/mitchelloharawild.com//blog/fable">https://mitchelloharawild.github.io/mitchelloharawild.com//blog/fable</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -758,7 +758,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/mitchelloharawild\.github\.io\/mitchelloharawild\.com\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

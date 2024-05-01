@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mitchell O’Hara-Wild">
+<meta name="dcterms.date" content="2019-09-30">
+<meta name="description" content="Forecasting models for tidy time series">
+
+<title>Mitchell O’Hara-Wild - Introducing fable</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mitchell O’Hara-Wild</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Introducing fable</h1>
+                  <div>
+        <div class="description">
+          Forecasting models for tidy time series
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">release</div>
+                <div class="quarto-category">time series</div>
+                <div class="quarto-category">tidyverse</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mitchell O’Hara-Wild </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 30, 2019</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">May 1, 2024</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#fable-forecasting-with-tables" id="toc-fable-forecasting-with-tables" class="nav-link active" data-scroll-target="#fable-forecasting-with-tables">fable: forecasting with tables</a></li>
+  <li><a href="#forecasting-with-fable" id="toc-forecasting-with-fable" class="nav-link" data-scroll-target="#forecasting-with-fable">Forecasting with fable</a>
+  <ul class="collapse">
+  <li><a href="#data-manipulation-and-exploration" id="toc-data-manipulation-and-exploration" class="nav-link" data-scroll-target="#data-manipulation-and-exploration">Data manipulation and exploration</a></li>
+  <li><a href="#model-specification" id="toc-model-specification" class="nav-link" data-scroll-target="#model-specification">Model specification</a></li>
+  <li><a href="#model-estimation" id="toc-model-estimation" class="nav-link" data-scroll-target="#model-estimation">Model estimation</a></li>
+  <li><a href="#producing-forecasts" id="toc-producing-forecasts" class="nav-link" data-scroll-target="#producing-forecasts">Producing forecasts</a></li>
+  <li><a href="#choosing-the-best-model" id="toc-choosing-the-best-model" class="nav-link" data-scroll-target="#choosing-the-best-model">Choosing the best model</a></li>
+  <li><a href="#scaling-it-up" id="toc-scaling-it-up" class="nav-link" data-scroll-target="#scaling-it-up">Scaling it up</a></li>
+  </ul></li>
+  <li><a href="#extensibility-with-fabletools" id="toc-extensibility-with-fabletools" class="nav-link" data-scroll-target="#extensibility-with-fabletools">Extensibility with fabletools</a></li>
+  <li><a href="#read-more-about-fable" id="toc-read-more-about-fable" class="nav-link" data-scroll-target="#read-more-about-fable">Read more about fable</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p><img src="fable.png" class="hex"></p>
+<p>The <a href="http://fable.tidyverts.org/">fable package</a> bridges the gap between popular tidy data analysis workflows and time series forecasting. Using tidy temporal data from <a href="https://earo.me/">Earo Wang</a>’s <a href="https://tsibble.tidyverts.org/">tsibble package</a>, fable allows complex forecasting tasks to be performed with ease. The package is the next iteration of <a href="https://robjhyndman.com/">Rob Hyndman</a>’s <a href="http://pkg.robjhyndman.com/forecast/">forecast package</a>, providing the tools and extensibility support needed to overcome current and future time series challenges. I’m ecstatic to announce that the fable package is now available on CRAN! So whether you’re a seasoned forecasting fanatic or you’re making your first foray into forecasting, getting started is easier than ever:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"fable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="fable-forecasting-with-tables" class="level1">
+<h1>fable: forecasting with tables</h1>
+<p>A major difference between <em>fable</em> and its predecessor <em>forecast</em> is the way in which time series data is stored. A substantial <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">source of confusion</a> for <em>forecast</em> package users is the creation and use of <code>ts</code> objects. The <em>fable</em> package is built upon the <em>tsibble</em> package, which (as the name suggests) is a <code>tibble</code> with time series structure. Among many benefits, the data is now in the same structure provided in most data files. This makes loading time series data into R a breeze (and less error-prone), as the column of data specifying the observation’s measurement time is now actually used in the data! Other benefits of a tabular data structure include integration with non-temporal packages and support for multiple time series with mixed measurement types.</p>
+<div class="row">
+<div class="col-lg-7" style="font-size:110%;">
+<blockquote class="blockquote">
+<p>A fable is never true, but it tells you something important about reality - and that’s what a forecast is.</p>
+<p><em>Rob Hyndman (2018-06-21)</em></p>
+<p>New York Open Statistical Programming Meetup https://youtu.be/yx6OQ-8HofU?t=2484</p>
+</blockquote>
+</div>
+<div class="col-lg-5">
+<p><img src="fable-nyhackr.png"></p>
+</div>
+</div>
+<p>The fable package has been actively developed over the past two years, and has undergone a couple of substantial revisions to the interface prior to release. Despite these changes the package’s goals have remained constant:</p>
+<ul>
+<li>Seamlessly integrate within a tidy data analysis workflow.</li>
+<li>Provide a consistent, intuitive and familiar interface for time series modelling.</li>
+<li>Simple forecasting (and reconciliation) of many related time series.</li>
+<li>Encourage extensibility by developing general forecasting tools.</li>
+<li>Provide forecasts with distributions, not intervals.</li>
+<li>Naturally support sub-daily and high frequency data with complex structures.</li>
+</ul>
+<p>The first release of fable implements all of these goals and more. While this post won’t cover the details of how these goals are achieved, I hope that the forecasting example below illustrates how these goals have been realised for forecasting in practice. I have no doubt that there will be many more blog posts which will explore fable in greater detail.</p>
+</section>
+<section id="forecasting-with-fable" class="level1">
+<h1>Forecasting with fable</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tsibble)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To see how fable can be applied to real forecasting problems we’ll create some simple forecasts of Australia’s domestic tourism. This is the same dataset analysed in the <a href="../feasts"><em>Introducing feasts</em></a> post, which provides a visual introduction to the data using the closely related <a href="http://feasts.tidyverts.org/">feasts package</a>.</p>
+<section id="data-manipulation-and-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="data-manipulation-and-exploration">Data manipulation and exploration</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tourism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 24,320 x 5 [1Q]
+# Key:       Region, State, Purpose [304]
+   Quarter Region   State           Purpose  Trips
+     &lt;qtr&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;chr&gt;    &lt;dbl&gt;
+ 1 1998 Q1 Adelaide South Australia Business  135.
+ 2 1998 Q2 Adelaide South Australia Business  110.
+ 3 1998 Q3 Adelaide South Australia Business  166.
+ 4 1998 Q4 Adelaide South Australia Business  127.
+ 5 1999 Q1 Adelaide South Australia Business  137.
+ 6 1999 Q2 Adelaide South Australia Business  200.
+ 7 1999 Q3 Adelaide South Australia Business  169.
+ 8 1999 Q4 Adelaide South Australia Business  134.
+ 9 2000 Q1 Adelaide South Australia Business  154.
+10 2000 Q2 Adelaide South Australia Business  169.
+# i 24,310 more rows</code></pre>
+</div>
+</div>
+<p>This dataset contains quarterly domestic overnight trips for a variety of locations and purposes around Australia. When disaggregated by the key variables (Region, State and Purpose), we have a total of 304 separate time series to forecast.</p>
+<p>Let’s start simple and use <a href="https://dplyr.tidyverse.org/">dplyr</a> to calculate the total overnight domestic trips for Australia.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tourism_aus <span class="ot">&lt;-</span> tourism <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trips =</span> <span class="fu">sum</span>(Trips))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>tourism_aus</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 80 x 2 [1Q]
+   Quarter  Trips
+     &lt;qtr&gt;  &lt;dbl&gt;
+ 1 1998 Q1 23182.
+ 2 1998 Q2 20323.
+ 3 1998 Q3 19827.
+ 4 1998 Q4 20830.
+ 5 1999 Q1 22087.
+ 6 1999 Q2 21458.
+ 7 1999 Q3 19914.
+ 8 1999 Q4 20028.
+ 9 2000 Q1 22339.
+10 2000 Q2 19941.
+# i 70 more rows</code></pre>
+</div>
+</div>
+<p>At minimum, we should plot the data before considering a model for it. A tsibble dataset works seamlessly with <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, allowing you to design informative graphics for this data. For a quick look at the data we also support <code>autoplot()</code> functionality (and more time series plots discussed in <a href="../feasts"><em>Introducing feasts</em></a>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tourism_aus <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(Trips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/tourism-plot-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The first step to forecasting this data would be to identify appropriate model(s). A seasonal model would be required as the data shows signs of seasonality. Including trend would also be helpful, although as the trend has changed over time (becoming positive after 2010) our model will need to support this too. Considering this, an <a href="https://otexts.com/fpp3/ets.html">exponential smoothing model</a> may be suitable for this data.</p>
+</section>
+<section id="model-specification" class="level3">
+<h3 class="anchored" data-anchor-id="model-specification">Model specification</h3>
+<p>Model specification in fable supports a formula based interface (much like <code>lm()</code> and other cross-sectional modelling functions). A model formula in R is expressed using <code>response ~ terms</code>, where the formula’s left side describes the response (and any transformations), while the right describes terms used to model the response. The terms of a fable model often include model specific functions called ‘specials’. They describe how the time series dynamics are captured by the model, and the supported specials can be found in the method’s help file.</p>
+<p>Exponential smoothing models are defined using the <a href="http://fable.tidyverts.org/reference/ETS.html"><code>ETS()</code></a> function, which provides ‘specials’ for controlling the <code>error()</code>, <code>trend()</code> and <code>season()</code>. These time series elements appear to be additively combined to give the response, and so an appropriate model specification may be:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ETS</span>(Trips <span class="sc">~</span> <span class="fu">error</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">trend</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">season</span>(<span class="st">"A"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Identifying an appropriate model specification can be tricky as it requires some background knowledge about temporal patterns and ETS models. Don’t be discouraged! If your unsure, you can let <code>ETS()</code> and other models automatically choose the best specification if multiple options are provided. So if you can’t tell if the seasonality is additive (<code>season("A")</code>) or multiplicative (<code>season("M")</code>), you can let fable decide via:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ETS</span>(Trips <span class="sc">~</span> <span class="fu">error</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">trend</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">season</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"M"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In fact this automatic selection is the default option. If the <code>season()</code> special is not specified (excluded entirely from formula), the seasonal structure will be automatically chosen as either none, additive or multiplicative seasonality with <code>season(c("N", "A", "M"))</code>. Automatic selection also occurs when <code>error()</code> and <code>trend()</code> are not specified, allowing an appropriate ETS model to be determined fully automatically with:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ETS</span>(Trips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="model-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="model-estimation">Model estimation</h3>
+<p>A model is estimated using the <code>model()</code> function, which uses a dataset to train one or more specified models.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_aus <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="at">auto_ets =</span> <span class="fu">ETS</span>(Trips))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 1 x 1
+      auto_ets
+       &lt;model&gt;
+1 &lt;ETS(A,A,A)&gt;</code></pre>
+</div>
+</div>
+<p>The resulting mable (model table) object informs us that an ETS(A,A,A) model has been automatically selected. Within that cell a complete description of the model is stored, including everything needed to produce forecasts (such as estimated coefficients). The <code>report()</code> function can be used if the mable contains only one model, which provides a familiar display of the models estimates and summary measures.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">report</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Series: Trips 
+Model: ETS(A,A,A) 
+  Smoothing parameters:
+    alpha = 0.4495675 
+    beta  = 0.04450178 
+    gamma = 0.0001000075 
+
+  Initial states:
+     l[0]      b[0]      s[0]     s[-1]     s[-2]    s[-3]
+ 21689.64 -58.46946 -125.8548 -816.3416 -324.5553 1266.752
+
+  sigma^2:  699901.4
+
+     AIC     AICc      BIC 
+1436.829 1439.400 1458.267 </code></pre>
+</div>
+</div>
+<p>The package also supports verbs from the <a href="https://broom.tidyverse.org/">broom package</a>, allowing you to <code>tidy()</code> your coefficients, <code>glance()</code> your model summary statistics, and <code>augment()</code> your data with predictions. These verbs provide convenient and consistent methods for accessing useful values from an estimated model.</p>
+</section>
+<section id="producing-forecasts" class="level3">
+<h3 class="anchored" data-anchor-id="producing-forecasts">Producing forecasts</h3>
+<p>The <code>forecast()</code> function is used to produce forecasts from estimated models. The forecast horizon (<code>h</code>) is used to specify how far into the future forecasts should be made. <code>h</code> can be specified with a number (the number of future observations) or text (the length of time to predict). You can also specify the time periods to predict using <code>new_data</code>, which allows you to provide a tsibble of future time points to forecast, along with any exogenous regressors which may be required by the model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fc <span class="ot">&lt;-</span> fit <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A fable: 8 x 4 [1Q]
+# Key:     .model [1]
+  .model   Quarter             Trips  .mean
+  &lt;chr&gt;      &lt;qtr&gt;            &lt;dist&gt;  &lt;dbl&gt;
+1 auto_ets 2018 Q1   N(29068, 7e+05) 29068.
+2 auto_ets 2018 Q2  N(27794, 870750) 27794.
+3 auto_ets 2018 Q3 N(27619, 1073763) 27619.
+4 auto_ets 2018 Q4 N(28627, 1311711) 28627.
+5 auto_ets 2019 Q1 N(30336, 1587455) 30336.
+6 auto_ets 2019 Q2 N(29062, 1903591) 29062.
+7 auto_ets 2019 Q3 N(28887, 2262980) 28887.
+8 auto_ets 2019 Q4 N(29895, 2668392) 29895.</code></pre>
+</div>
+</div>
+<p>You’ll notice that this function gives us a fable (forecast table), which contains point forecasts in the <code>Trips</code> column, and the forecast’s distribution in the <code>.distribution</code> column. If we had specified a transformation in the model specification (say <code>ETS(log(Trips))</code>), the resulting forecasts would be <a href="http://fable.tidyverts.org/articles/transformations.html">automatically back transformed and adjusted for bias</a>.</p>
+<p>While using and storing distributions is powerful, they can be more difficult to interpret than intervals. Forecast intervals can be extracted from a forecast distribution using the <code>hilo()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fc <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hilo</span>(<span class="at">level =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">95</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 8 x 6 [1Q]
+# Key:       .model [1]
+  .model   Quarter             Trips  .mean                  `80%`
+  &lt;chr&gt;      &lt;qtr&gt;            &lt;dist&gt;  &lt;dbl&gt;                 &lt;hilo&gt;
+1 auto_ets 2018 Q1   N(29068, 7e+05) 29068. [27995.95, 30140.25]80
+2 auto_ets 2018 Q2  N(27794, 870750) 27794. [26597.85, 28989.59]80
+3 auto_ets 2018 Q3 N(27619, 1073763) 27619. [26291.05, 28947.01]80
+4 auto_ets 2018 Q4 N(28627, 1311711) 28627. [27158.76, 30094.28]80
+5 auto_ets 2019 Q1 N(30336, 1587455) 30336. [28721.43, 31950.79]80
+6 auto_ets 2019 Q2 N(29062, 1903591) 29062. [27293.57, 30829.90]80
+7 auto_ets 2019 Q3 N(28887, 2262980) 28887. [26959.18, 30814.90]80
+8 auto_ets 2019 Q4 N(29895, 2668392) 29895. [27801.09, 31987.98]80
+# i 1 more variable: `95%` &lt;hilo&gt;</code></pre>
+</div>
+</div>
+<p>Rather than reading values from a table, it is usually easier to evaluate forecast behaviour by making a plot. Much like plotting a tsibble, we have provided <code>autoplot()</code> and <code>autolayer()</code> methods for plotting forecasts. Unlike the <em>forecast</em> package, <em>fable</em> does not store the original data and fitted model in the <code>fable</code> object, so the historical data must be passed in to see it on the plot.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fc <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_aus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="choosing-the-best-model" class="level3">
+<h3 class="anchored" data-anchor-id="choosing-the-best-model">Choosing the best model</h3>
+<p>While <code>ETS()</code> has been able to choose the best ETS model for this data, a different model class may give even better results. The <code>model()</code> function is capable of estimating many specified models. Let’s compare the ETS model with an automatically selected <a href="fable.tidyverts.org/reference/ARIMA.html"><code>ARIMA()</code></a> model (much like <a href="http://pkg.robjhyndman.com/forecast/reference/auto.arima.html"><code>forecast::auto.arima()</code></a>) and a linear model (<a href="http://fable.tidyverts.org/reference/TSLM.html"><code>TSLM()</code></a>) with linear time trend and dummy seasonality.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_aus <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">TSLM</span>(Trips <span class="sc">~</span> <span class="fu">trend</span>() <span class="sc">+</span> <span class="fu">season</span>())</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 1 x 3
+           ets                    arima      lm
+       &lt;model&gt;                  &lt;model&gt; &lt;model&gt;
+1 &lt;ETS(A,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;  &lt;TSLM&gt;</code></pre>
+</div>
+</div>
+<p>The mable now contains three models, each specified model is stored in a separate column.</p>
+<p>We can produce forecasts and visualise the results using the same code as before. To minimise overplotting I have chosen to only show the 80% forecast interval, and have made the forecasts semi-transparent.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fit <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_aus, <span class="at">level =</span> <span class="dv">80</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/many-fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It is clear from this plot that the linear model (<code>lm</code>) is unable to capture the trend change at 2010. The linear model could be improved by using a piecewise linear trend with a knot at 2010, but I’ll leave that for you to try (replace <code>trend()</code> with <code>trend(knots = yearquarter("2010 Q1"))</code>).</p>
+<p>Visually distinguishing the best model between ETS and ARIMA is difficult. The ETS model predicts a stronger trend than the ARIMA model, and both produce very similar seasonal patterns.</p>
+<p>To choose the best model we can make use of numerical accuracy measures using the <code>accuracy()</code> function. This function can compute various accuracy measures based on <a href="https://fabletools.tidyverts.org/reference/point_accuracy_measures.html">point forecasts</a>, <a href="https://fabletools.tidyverts.org/reference/interval_accuracy_measures.html">forecast intervals</a> and <a href="https://fabletools.tidyverts.org/reference/distribution_accuracy_measures.html">forecast distributions</a>. It also allows you to specify your own accuracy measure functions.</p>
+<p>Training (in-sample) accuracy will be given when applied to a mable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">accuracy</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 x 10
+  .model .type           ME  RMSE   MAE    MPE  MAPE  MASE RMSSE     ACF1
+  &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+1 ets    Training  1.05e+ 2  794.  604.  0.379  2.86 0.636 0.653 -0.00151
+2 arima  Training  1.54e+ 2  840.  632.  0.584  2.97 0.666 0.691 -0.0432 
+3 lm     Training -1.82e-13 1715. 1436. -0.597  6.67 1.51  1.41   0.816  </code></pre>
+</div>
+</div>
+<p>The in-sample accuracy suggests that the ETS model performs best. This is because it has the lowest values for all accuracy measures (lower values indicate less errors). As expected, the linear model is much worse than the others.</p>
+<p>Forecast (out-of-sample) accuracy will be computed when a fable is used with <code>accuracy()</code>. Note that you will need to withhold a test set to base your accuracy on.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tourism_aus <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Withhold the last 3 years before fitting the model</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Quarter <span class="sc">&lt;</span> <span class="fu">yearquarter</span>(<span class="st">"2015 Q1"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate the models on the training data (1998-2014)</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips),</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">TSLM</span>(Trips <span class="sc">~</span> <span class="fu">trend</span>() <span class="sc">+</span> <span class="fu">season</span>())</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Forecast the witheld time peroid (2015-2017)</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"3 years"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute accuracy of the forecasts relative to the actual data </span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(tourism_aus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 x 10
+  .model .type    ME  RMSE   MAE   MPE  MAPE  MASE RMSSE  ACF1
+  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 arima  Test  1397. 1795. 1452.  5.31  5.54  1.58  1.49 0.496
+2 ets    Test  1895. 2281. 1909.  7.23  7.28  2.08  1.90 0.613
+3 lm     Test  4664. 4822. 4664. 18.1  18.1   5.09  4.01 0.634</code></pre>
+</div>
+</div>
+<p>The out-of-sample accuracy shows that the ARIMA model produced the most accurate forecasts for 2015-2017 using data from 1998-2014.</p>
+<p>So which model is best? In-sample (training) accuracy uses one-step ahead forecast errors from model coefficients based on the whole data. In many senses this is unrealistic, as the forecasts are partially based on information not available when forecasting into the future. Additionally, these forecasts are based only on one-step ahead accuracy, where in practice you may be interested in forecasting a few years ahead.</p>
+<p>Alternatively, out-of-sample (test) accuracy is more akin to the actual forecasting task: predicting the future using only past information. The accuracy is based on forecast errors from three years of data never seen by the model. This advantage is also a problem, as the accuracy is now based on just 12 values, so the performance is more sensitive to chance. Calculating accuracy using <a href="https://otexts.com/fpp3/tscv.html">time series cross-validation</a> overcomes many of these problems, but will take more time to compute.</p>
+<p>In short, both ETS and ARIMA models are producing reasonable forecasts for this data. Instead of choosing a favourite, we can do better by averaging them which usually gives better results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_aus <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">average =</span> (ets <span class="sc">+</span> arima) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 1 x 3
+           ets                    arima       average
+       &lt;model&gt;                  &lt;model&gt;       &lt;model&gt;
+1 &lt;ETS(A,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fit <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_aus, <span class="at">level =</span> <span class="dv">80</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/ensemble-fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="scaling-it-up" class="level3">
+<h3 class="anchored" data-anchor-id="scaling-it-up">Scaling it up</h3>
+<p>Producing forecasts for a single time series isn’t particularly exciting, and certainly doesn’t align well with modern forecasting problems. Suppose we were interested in forecasting tourism for each of Australia’s major states (and territories).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tourism_state <span class="ot">&lt;-</span> tourism <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(State) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trips =</span> <span class="fu">sum</span>(Trips))</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>tourism_state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tsibble: 640 x 3 [1Q]
+# Key:       State [8]
+   State Quarter Trips
+   &lt;chr&gt;   &lt;qtr&gt; &lt;dbl&gt;
+ 1 ACT   1998 Q1  551.
+ 2 ACT   1998 Q2  416.
+ 3 ACT   1998 Q3  436.
+ 4 ACT   1998 Q4  450.
+ 5 ACT   1999 Q1  379.
+ 6 ACT   1999 Q2  558.
+ 7 ACT   1999 Q3  449.
+ 8 ACT   1999 Q4  595.
+ 9 ACT   2000 Q1  600.
+10 ACT   2000 Q2  557.
+# i 630 more rows</code></pre>
+</div>
+</div>
+<p>The data now contains 8 separate time series, each with different time series characteristics:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tourism_state <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(Trips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/tourism-state-plot-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This is where the automatic model selection in <em>fable</em> is particularly useful. The <code>model()</code> function will estimate a specified model to all series in the data, so producing many models is simple.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_state <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">average =</span> (ets <span class="sc">+</span> arima)<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A mable: 8 x 4
+# Key:     State [8]
+  State                       ets                    arima       average
+  &lt;chr&gt;                   &lt;model&gt;                  &lt;model&gt;       &lt;model&gt;
+1 ACT                &lt;ETS(M,A,N)&gt;           &lt;ARIMA(0,1,1)&gt; &lt;COMBINATION&gt;
+2 New South Wales    &lt;ETS(A,N,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+3 Northern Territory &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+4 Queensland         &lt;ETS(A,N,A)&gt;           &lt;ARIMA(2,1,2)&gt; &lt;COMBINATION&gt;
+5 South Australia    &lt;ETS(M,N,A)&gt; &lt;ARIMA(1,0,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+6 Tasmania           &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,0,3)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
+7 Victoria           &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
+8 Western Australia  &lt;ETS(M,N,M)&gt;           &lt;ARIMA(0,1,3)&gt; &lt;COMBINATION&gt;</code></pre>
+</div>
+</div>
+<p>Each row of a mable corresponds to a separate time series (uniquely identified by its keys). From the output we can see a wide variety of models have been chosen. Some models have trend, others have seasonality, some have neither trend nor seasonality!</p>
+<p>Producing forecasts and evaluating accuracy is no different whether you’re modelling one time series or a hundred.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>fit <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_state, <span class="at">level =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/state-fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="extensibility-with-fabletools" class="level1">
+<h1>Extensibility with fabletools</h1>
+<p>Extensibility is at the core of fable. <em>fable</em> is actually built as an extension of the more general <a href="https://fabletools.tidyverts.org/"><em>fabletools</em> package</a>. This allows extension modelling package developers to focus on writing methods specific to their model. More general methods used in modelling and forecasting are provided automatically by <em>fabletools</em>.</p>
+<p>Depending on the chosen model, the following features are supported:</p>
+<ul>
+<li>Forecasting (<code>forecast()</code>)</li>
+<li>Missing value interpolation (<code>interpolate()</code>)</li>
+<li>Reporting model output (<code>report()</code>)</li>
+<li>Simulation of future paths (<code>generate()</code>)</li>
+<li>Streaming new data (<code>stream()</code>)</li>
+<li>Re-estimation (<code>refit()</code>)</li>
+<li>Decomposition of model components (<code>components()</code>)</li>
+<li>Model equation output (<code>equation()</code>)</li>
+<li>Broom verbs (<code>augment()</code>, <code>coef()</code>/<code>tidy()</code>, <code>glance()</code>)</li>
+<li>Model fits (<code>fitted()</code>, <code>residuals()</code>)</li>
+</ul>
+<p>General <em>fabletools</em> functionality for all models include:</p>
+<ul>
+<li>Seamless integration with existing packages in the tidyverse</li>
+<li>Tools for consistent modelling interface design (such as formula parsing)</li>
+<li>Response transformations and back-transformations with bias adjustment</li>
+<li>Batch modelling with parallelisation</li>
+<li>Forecast distributions and intervals</li>
+<li>Visualisation of time series, decompositions, and forecasts (<code>autoplot()</code>)</li>
+<li>Accuracy evaluation (<code>accuracy()</code>) with <a href="https://fabletools.tidyverts.org/reference/index.html#section-accuracy-evaluation">many accuracy measures</a></li>
+<li>Model combination (<code>combination_model()</code> / <code>(ets + arima)/2</code>)</li>
+<li>Decomposition modelling (<code>decomposition_model()</code>)</li>
+<li>Forecast reconciliation (<code>reconcile()</code>, <code>min_trace()</code>)</li>
+</ul>
+<p>Keep an eye out for more extension modelling packages being released this year!</p>
+</section>
+<section id="read-more-about-fable" class="level1">
+<h1>Read more about fable</h1>
+<p>While this blog post is long and covers a lot of things about forecasting with fable, it is far from comprehensive. Currently, the best resource for learning forecasting with fable is the <a href="https://otexts.com/fpp3/"><em>Forecasting: Principles and Practices (3ed.)</em></a> book, which is freely available online.</p>
+<p>Some other places with more information about <em>fable</em> include:</p>
+<ul>
+<li>The <a href="http://fable.tidyverts.org/">pkgdown website</a></li>
+<li>Rob Hyndman’s blog post: <a href="https://robjhyndman.com/hyndsight/fable/"><em>Tidy forecasting in R</em></a></li>
+<li>The <a href="http://fable.tidyverts.org/articles/fable.html"><em>Introduction to fable</em></a> vignette</li>
+<li>UseR!2019 talk: <a href="https://www.youtube.com/watch?v=DhDOTxojQ3k"><em>Flexible futures for fable functionality</em></a></li>
+<li>The <a href="https://github.com/tidyverts/fable/">GitHub repository</a></li>
+</ul>
+<!-- --- -->
+<!-- Tidy time series -->
+<!-- Recent time series challenges are characterised by the need to forecast many time series that are observed very frequently.    -->
+<!-- Using appropriate data structures is an essential first step in tackling these challenges. Many temporal data structures have been proposed in the past, each attempting to find a balance between efficiency and generality. On the two extremes of this spectrum are `ts` and `tsibble` (used by forecast and fable packages respectively).  -->
+<!-- The `ts` class provides the bare minimum, making it very efficient but extremely limited. It consists of a vector of numbers, and 3 numbers describing the start, end, and frequency of the data. As a result, it is limited to a single time series that is observed at regular intervals.  -->
+<!-- ts object -->
+<!-- A `tsibble` is a tibble for time series, which makes it very general at the expense of some overhead. Many time series are stored in a tidy format using key variables, and multiple measurements (of any class) can be stored as measured variables in the columns. The data must also contain an index, which describes the time for each observation. This flexibility makes it suitable for working with time series commonly collected today.  -->
+<!-- tsibble object -->
+<!-- Which is better? In almost every case `tsibble`. If you're working with a single regularly spaced time series, `ts` may be slightly faster but you lose access to many great packages designed around tidy data. The use of `ts` in the forecast package is a common source of confusion for new forecasters: creating a ts object, frequency, plot axis.  -->
+<!-- Tidy temporal data with tsibble forms the foundation of fable, allowing existing data analysis skills to be used within a time series forecasting workflow.  -->
+<!-- tsibble plot -->
+<!-- Forecasting with fable -->
+<!-- Modelling functions in fable use a formula based interface, which should be familiar to those  -->
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{o'hara-wild2019,
+  author = {O’Hara-Wild, Mitchell},
+  title = {Introducing Fable},
+  date = {2019-09-30},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2019" class="csl-entry quarto-appendix-citeas" role="listitem">
+O’Hara-Wild, Mitchell. 2019. <span>“Introducing Fable.”</span> September
+30, 2019.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://giscus.app/client.js" data-repo="mitchelloharawild/mitchelloharawild.com" data-repo-id="R_kgDOL1lyyA" data-category="Blog" data-category-id="DIC_kwDOL1lyyM4CfEDn" data-mapping="pathname" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="light">
+</div> <!-- /content -->
+
+
+
+
+</body></html>

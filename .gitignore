@@ -4,4 +4,5 @@
 .Ruserdata
 
 /.quarto/
-_site
+/_site/
+/site_libs/

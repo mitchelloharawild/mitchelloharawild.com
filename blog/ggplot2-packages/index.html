@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2019-09-30">
 <meta name="description" content="Forecasting models for tidy time series">
 
-<title>Mitchell O’Hara-Wild - Introducing fable</title>
+<title>Mitchell O’Hara-Wild - Extension and wrapper packages of ggplot2</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -144,7 +144,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Introducing fable</h1>
+      <h1 class="title">Extension and wrapper packages of ggplot2</h1>
                   <div>
         <div class="description">
           Forecasting models for tidy time series
@@ -272,7 +272,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  8 1999 Q4 Adelaide South Australia Business  134.
  9 2000 Q1 Adelaide South Australia Business  154.
 10 2000 Q2 Adelaide South Australia Business  169.
-# i 24,310 more rows</code></pre>
+# ℹ 24,310 more rows</code></pre>
 </div>
 </div>
 <p>This dataset contains quarterly domestic overnight trips for a variety of locations and purposes around Australia. When disaggregated by the key variables (Region, State and Purpose), we have a total of 304 separate time series to forecast.</p>
@@ -295,7 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  8 1999 Q4 20028.
  9 2000 Q1 22339.
 10 2000 Q2 19941.
-# i 70 more rows</code></pre>
+# ℹ 70 more rows</code></pre>
 </div>
 </div>
 <p>At minimum, we should plot the data before considering a model for it. A tsibble dataset works seamlessly with <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, allowing you to design informative graphics for this data. For a quick look at the data we also support <code>autoplot()</code> functionality (and more time series plots discussed in <a href="../feasts"><em>Introducing feasts</em></a>).</p>
@@ -405,7 +405,7 @@ Model: ETS(A,A,A)
 6 auto_ets 2019 Q2 N(29062, 1903591) 29062. [27293.57, 30829.90]80
 7 auto_ets 2019 Q3 N(28887, 2262980) 28887. [26959.18, 30814.90]80
 8 auto_ets 2019 Q4 N(29895, 2668392) 29895. [27801.09, 31987.98]80
-# i 1 more variable: `95%` &lt;hilo&gt;</code></pre>
+# ℹ 1 more variable: `95%` &lt;hilo&gt;</code></pre>
 </div>
 </div>
 <p>Rather than reading values from a table, it is usually easier to evaluate forecast behaviour by making a plot. Much like plotting a tsibble, we have provided <code>autoplot()</code> and <code>autolayer()</code> methods for plotting forecasts. Unlike the <em>forecast</em> package, <em>fable</em> does not store the original data and fitted model in the <code>fable</code> object, so the historical data must be passed in to see it on the plot.</p>
@@ -460,7 +460,7 @@ Model: ETS(A,A,A)
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">accuracy</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 x 10
+<pre><code># A tibble: 3 × 10
   .model .type           ME  RMSE   MAE    MPE  MAPE  MASE RMSSE     ACF1
   &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
 1 ets    Training  1.05e+ 2  794.  604.  0.379  2.86 0.636 0.653 -0.00151
@@ -485,7 +485,7 @@ Model: ETS(A,A,A)
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute accuracy of the forecasts relative to the actual data </span></span>
 <span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(tourism_aus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 x 10
+<pre><code># A tibble: 3 × 10
   .model .type    ME  RMSE   MAE   MPE  MAPE  MASE RMSSE  ACF1
   &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 1 arima  Test  1397. 1795. 1452.  5.31  5.54  1.58  1.49 0.496
@@ -550,7 +550,7 @@ Model: ETS(A,A,A)
  8 ACT   1999 Q4  595.
  9 ACT   2000 Q1  600.
 10 ACT   2000 Q2  557.
-# i 630 more rows</code></pre>
+# ℹ 630 more rows</code></pre>
 </div>
 </div>
 <p>The data now contains 8 separate time series, each with different time series characteristics:</p>
@@ -668,14 +668,14 @@ Model: ETS(A,A,A)
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{o'hara-wild2019,
   author = {O’Hara-Wild, Mitchell},
-  title = {Introducing Fable},
+  title = {Extension and Wrapper Packages of Ggplot2},
   date = {2019-09-30},
-  url = {https://mitchelloharawild.github.io/mitchelloharawild.com//blog/fable},
+  url = {https://mitchelloharawild.github.io/mitchelloharawild.com//blog/ggplot2-packages},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2019" class="csl-entry quarto-appendix-citeas" role="listitem">
-O’Hara-Wild, Mitchell. 2019. <span>“Introducing Fable.”</span> September
-30, 2019. <a href="https://mitchelloharawild.github.io/mitchelloharawild.com//blog/fable">https://mitchelloharawild.github.io/mitchelloharawild.com//blog/fable</a>.
+O’Hara-Wild, Mitchell. 2019. <span>“Extension and Wrapper Packages of
+Ggplot2.”</span> September 30, 2019. <a href="https://mitchelloharawild.github.io/mitchelloharawild.com//blog/ggplot2-packages">https://mitchelloharawild.github.io/mitchelloharawild.com//blog/ggplot2-packages</a>.
 </div></div></section></div></main> <!-- /main -->
 <!-- plausible --> 
 <script defer="" data-domain="mitchelloharawild.com" src="https://track.mitchelloharawild.com/js/plausible.js"></script>

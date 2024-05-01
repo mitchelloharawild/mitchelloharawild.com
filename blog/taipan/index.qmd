@@ -1,7 +1,6 @@
 ---
 title: Introducing taipan
 description: 'Annotate images for analysis with taipan'
-author: Mitchell O'Hara-Wild
 date: '2018-09-27'
 categories:
   - release

@@ -1,7 +1,6 @@
 ---
 title: Introducing vitae
 description: 'Automate your CV with vitae'
-author: Mitchell O'Hara-Wild
 date: '2019-01-09'
 categories:
   - release

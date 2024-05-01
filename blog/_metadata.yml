@@ -1,0 +1,26 @@
+author: "Mitchell O'Hara-Wild"
+image: featured.jpg
+card-style: "summary"
+date-modified: last-modified
+
+# Evaluation / display options
+freeze: true
+citation: true
+
+# blogpost format
+format:
+  html:
+    toc: true
+title-block-banner: true
+
+# giscus comments
+comments:
+  giscus:
+    theme: light
+    repo: mitchelloharawild/mitchelloharawild.com
+    repo-id: R_kgDOL1lyyA
+    category: Blog
+    category-id: DIC_kwDOL1lyyM4CfEDn
+    mapping: pathname
+    reactions-enabled: true
+    input-position: top

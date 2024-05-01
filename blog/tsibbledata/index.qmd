@@ -1,7 +1,6 @@
 ---
 title: Introducing tsibbledata
 description: 'Diverse datasets for tsibble'
-author: Mitchell O'Hara-Wild
 date: '2019-06-15'
 categories:
   - release

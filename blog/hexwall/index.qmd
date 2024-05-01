@@ -1,7 +1,6 @@
 ---
 title: Arranging hex stickers in R
 description: 'Features magick to create the purrr-fect hex layout'
-author: Mitchell O'Hara-Wild
 date: '2018-07-10'
 categories:
   - magick

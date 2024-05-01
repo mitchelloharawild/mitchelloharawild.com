@@ -2,8 +2,8 @@
 title: "Blog"
 listing:
   contents: blog
-  fields: [image, date, title, description, reading-time]
+  fields: [image, date, title, description, categories, reading-time]
   sort: "date desc"
+  categories: true
 type: default
-categories: true
 ---

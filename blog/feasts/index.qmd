@@ -1,7 +1,6 @@
 ---
 title: Introducing feasts
 description: 'Feature extraction and statistics for time series'
-author: Mitchell O'Hara-Wild
 date: '2019-08-30'
 categories:
   - release

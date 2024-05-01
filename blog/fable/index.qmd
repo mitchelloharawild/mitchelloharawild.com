@@ -1,7 +1,6 @@
 ---
 title: Introducing fable
 description: 'Forecasting models for tidy time series'
-author: Mitchell O'Hara-Wild
 date: '2019-09-30'
 categories:
   - release

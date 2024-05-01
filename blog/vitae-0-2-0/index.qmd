@@ -1,7 +1,6 @@
 ---
 title: vitae 0.2.0
 description: 'New templates and more features'
-author: Mitchell O'Hara-Wild
 date: '2019-07-12'
 slug: vitae-0-2-0
 categories:

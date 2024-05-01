@@ -10,6 +10,9 @@ about:
     - icon: github
       text: GitHub
       href: https://github.com/mitchelloharawild/
+    - icon: youtube
+      text: YouTube
+      href: https://www.youtube.com/channel/UC4_Lh5TIQDs5Ox8MklkCZ2A
     - icon: mortarboard
       text: Google Scholar
       href: https://scholar.google.com/citations?user=NVlC6vMAAAAJ
@@ -20,3 +23,5 @@ about:
       text: Email
       href: mailto:mail@mitchelloharawild.com
 ---
+
+PhD candidate at Monash University; Consultant at Nectric. Data scientist and developer of statistical software.

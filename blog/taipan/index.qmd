@@ -22,7 +22,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-`r htmltools::img(src = "taipan.png", class = "hex")` Annotating images is tiresome work, and existing tools do not make this much easier. Identifying features within images is a common task for training and evaluating machine learning models, and taipan aims to simplify this very manual process.
+`r htmltools::img(src = "taipan.png", class = "hex")` 
+
+Annotating images is tiresome work, and existing tools do not make this much easier. Identifying features within images is a common task for training and evaluating machine learning models, and taipan aims to simplify this very manual process.
 
 # What is taipan?
 

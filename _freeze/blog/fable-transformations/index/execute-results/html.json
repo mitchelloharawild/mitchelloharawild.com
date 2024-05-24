@@ -1,0 +1,15 @@
+{
+  "hash": "f0b99b9eaa7061dcc2ad8c2a3e55e5a3",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: Transformations in fable\ndescription: 'Simplifying data for modelling with transformations'\ndate: today\ncategories:\n  - time series\n  - forecasting\ntags:\n  - cran\n  - package\n  - time series\nimage: 'fable-opengraph.png'\nimage-alt: 'fable: tidy time series forecasting'\n---\n\n\n\n\n`<img src=\"fable.png\" class=\"hex\"/>`{=html}\n\n* How apply different transformations across multiple time series\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

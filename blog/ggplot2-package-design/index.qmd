@@ -1,0 +1,314 @@
+---
+title: Why I refuse to add style options to my ggplot2 plot functions
+description: 'Designing plot helper and grammar extension functions for ggplot2, and how good design helps you make better plots.'
+date: today
+categories:
+  - ggplot2
+  - packages
+tags:
+  - cran
+  - package
+  - time series
+execute:
+  cache: true
+image-alt: 'Drawing of a package'
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.width = 8.5)
+```
+
+![](ggplot2.svg){class="hex"}
+
+<!-- ## Can you add this? no! -->
+
+I develop many packages with functions that use [ggplot2](https://ggplot2.tidyverse.org/) to make a specific plot, and I'm often asked if I could add new arguments for changing the style, appearance, or layout of the plot. My answer is *almost always*^[The few times I have implemented these requests I later realise I shouldn't have.] a resounding ***no!***, followed by encouragement to make the plot themselves without the plot helper function.
+
+<!-- For example, changing the colour of the horizontal average lines in a seasonal subseries plot. -->
+
+This outright refusal to implement easy plot *improvements* might surprise users and seem harsh - after all it is easy to add an argument for changing plot colours thanks to ggplot2's grammar-based design. 
+
+Why do I refuse to make these easy improvements?
+It's a matter of design.
+
+<!-- along with some functions which extend ggplot2 with new geometries -->
+
+<!-- * asked to add new features for changing style / appearance of `autoplot()` or `gg_*()` functions - but I say no, why? (I've even asked myself to do this! https://github.com/tidyverts/feasts/issues/134), https://github.com/tidyverts/feasts/issues/109 -->
+
+<!-- * sometimes I have added arguments for changing the line colour, but later regret it (possibly introducing breaking changes through removing option). -->
+<!-- * these features are easy to add thanks to the grammar in ggplot2 - but it's hard to design a wrapper which exposes the grammar -->
+
+<!--- To understand what I mean by design, let me briefly cover two common ggplot2 design patterns --->
+
+## Design patterns of ggplot2 extensions
+
+*Extension*[^ext-gallery] functions of ggplot2 can be categorised into two distinct groups:
+
+[^ext-gallery]: I take semantic/pedantic issue with calling functions which use ggplot2 'extensions', and think this causes some design confusion among developers and users. Both function types appear in the ggplot2 [official *'extensions'* gallery](https://exts.ggplot2.tidyverse.org/gallery/), and consequently it is common for all ggplot2-related packages to be called extensions.
+
+1. Functions which *use* ggplot2 (plot helpers)
+   
+   These functions produce a specific plot with a single function, useful for quickly creating a common plot for the data or analysis.
+   
+   ::: {.callout-note title="Example: `autoplot()` for time-series plots" collapse="true"}
+
+   ```{r timeplot}
+   #| message: false
+   library(fable)
+   tsibble::as_tsibble(USAccDeaths) |> 
+     autoplot(value)
+   ```
+   :::
+   
+2. Functions which *extend* ggplot2 (grammar extensions)
+
+   These functions add to the plotting grammar available in ggplot2, and are highly customisable and versatile. On their own, grammar extension functions don't produce plots but rather plot elements - plots are constructed using a combination of plot elements.
+
+   ::: {.callout-note title="Example: `ggrepel::geom_text_repel()`" collapse="true"}
+   
+   ```{r textrepel}
+   #| message: false
+   library(ggrepel)
+   ggplot(mtcars, aes(wt, mpg, label = rownames(mtcars))) +
+     geom_text_repel() +
+     geom_point(color = 'red')
+   ```
+   :::
+
+<!-- Both types of functions are useful but serve different purposes, and therefore should have different software designs. -->
+
+Plot helpers and ggplot2 extension functions are both useful, but serve different purposes in an analysis <!-- workflow--->. The design tendency of doing too much can make these functions less useful for their purpose. In particular for ggplot2 extension packages, it is common to make plot helpers more extensible and ggplot2 extensions more helpful. 
+
+Why does this become a design problem? Read on...
+
+<!-- In many ggplot2 extension packages I see each group attempt to incorporate designs of the other. Plot helper functions that use ggplot2 attempt to add style customisation by exposing the grammar and single grammar extension functions attempt to do the work of many. -->
+
+<!-- TODO: Rephrase this paragraph, add emphasis on why I refuse for design purposes -->
+<!-- Aside: these design considerations apply not just to ggplot2 extensions but designing good composable abstractions and wrapper functions -->
+
+<!-- * in defence of plotting functions in the context of extending the grammar - many people dislike `autoplot()` and other single-plot helper functions, I disagree. -->
+
+<!-- Types of 'extensions' for ggplot2 -->
+
+<!-- * 'wrapper' functions which use ggplot2 -->
+
+<!-- * extensions of ggplot2 with ggproto -->
+
+### Plot helpers using ggplot2
+
+Plot helper functions use many ggplot2 elements together into a simple function for creating a specific graphic. These functions abstract away the grammar of graphics, and their design should focus on *what* is being plotted (the data and its patterns) rather than *how* (the geometries, aesthetic mappings, and more).
+
+Take for example the `feasts::gg_season()` function for plotting a seasonal plot of time-series data, which is commonly used in a time-series analysis to understand the shape of the seasonality (identifying peak times from throughs).
+
+```{r seasonplot}
+#| message: false
+library(tsibble)
+as_tsibble(USAccDeaths) |> 
+  feasts::gg_season(y = value)
+```
+
+Functions like these are really useful during an analysis, allowing a quick peek at the data without needing to repeatedly write the same grammar elements (expand below) each and every time.
+
+::: {.callout-note title="Reproduction of above plot without gg_season()" collapse="true"}
+
+```{r seasonplot-diy}
+#| message: false
+library(ggplot2)
+library(lubridate)
+tsibble::as_tsibble(USAccDeaths) |> 
+  ggplot(aes(x = month(index), y = value, colour = factor(year(index)))) + 
+  geom_path() + 
+  scale_x_continuous(breaks = 1:12, labels = month.abb) + 
+  labs(y = "Accidental deaths in the USA", x = "Month", colour = "Year")
+```
+
+:::
+
+<!-- The design of `gg_season()` highlights *what* is being visualised, with minimal options to change *how* the plot is made: -->
+
+<!-- ```{r} -->
+<!-- #| eval: false -->
+<!-- gg_season( -->
+<!--   data, -->
+<!--   y = NULL, -->
+<!--   period = NULL, -->
+<!--   facet_period = NULL, -->
+<!--   max_col = Inf, -->
+<!--   max_col_discrete = 7, -->
+<!--   pal = (scales::hue_pal())(9), -->
+<!--   polar = FALSE, -->
+<!--   labels = c("none", "left", "right", "both"), -->
+<!--   labels_repel = FALSE, -->
+<!--   labels_left_nudge = 0, -->
+<!--   labels_right_nudge = 0, -->
+<!--   ... -->
+<!-- ) -->
+<!-- ``` -->
+
+The handling of the x-axis wrapping and line grouping/colouring is combined/abstracted as the seasonal `period`. Similar plot-specific abstraction is done for faceting seasons with `facet_period` allowing for quick and informative plots.
+
+```{r facetseasonplot}
+fill_gaps(pedestrian) |> 
+  dplyr::filter(Sensor == "Southern Cross Station") |> 
+  feasts::gg_season(y = Count, period = "day", facet_period = "1 weeks")
+```
+
+::: {.callout-note title="Reproduction of above plot without gg_season()" collapse="true"}
+
+```{r facetseasonplot-diy}
+#| message: false
+library(ggplot2)
+library(lubridate)
+fill_gaps(pedestrian) |> 
+  dplyr::filter(Sensor == "Southern Cross Station") |> 
+  ggplot(aes(x = hour(Date_Time), y = Count, colour = as.Date(Date_Time), group = as.Date(Date_Time))) + 
+  geom_path() + 
+  facet_grid(cols = vars(wday(Date_Time, label = TRUE, abbr = FALSE, week_start = 1))) + 
+  scale_color_gradientn(colours = scales::hue_pal()(9), labels = \(x) as.Date(x, origin = "1970-01-01")) +
+  labs(y = "Pedestrians at Southern Cross Station", x = "Hour", colour = "Date")
+```
+
+:::
+
+While useful, these plots aren't the prettiest - they don't try to be. Seasonal plots as shown above are unlikely to be readily suitable for wider publication, and the necessary improvements aren't limited to the theme and style. A useful similar alternative is using box-plots rather than lines to more clearly show the typical number of pedestrians throughout the day. Creating beautiful publication ready graphics involves more than simply using a suitable chart type and variables, but also carefully considering the layout, colours, and typography^[For more details I highly recommend this 20 minute presentation - [*The Glamour of Graphics*](https://www.youtube.com/watch?v=h5cTacaWE6I) by [William Chase](https://www.williamrchase.com/)].
+
+By not adding stylistic options to my plot helper functions, I hope to encourage users to think more creatively when constructing their visualisation. Not just using prettier colours or themes, but also creating more suitable chart types for better reader comprehension. After all, these plots are intended for experienced analysts to quickly preview important features of the data. They are aren't intended to be readily understood by an untrained reader.
+
+[Cynthia Huang](https://www.cynthiahqy.com/)'s companion blog post [*Layer arguments for ggplot2 wrapper functions*](https://www.cynthiahqy.com/posts/ggplot-wrapper-design) highlights the difficulty in creating plot helper functions which also expose the underlying grammar for further plot customisation. This design challenge is not specific to ggplot2 extensions, but more broadly applicable to any functions which abstract complexity away from underlying functions. The post offers a clever alternative that allows full plot customisation without adding countless style arguments which re-introduce complexity to an abstraction.
+
+<!-- Perhaps improve final message from this - possibly showing other helper functions which try to be extra helpful with many style arguments -->
+
+
+<!-- design difficulties of creating plot helper functions that also expose the grammar for further user customisation. -->
+
+<!-- Another reason against adding additional style arguments to plot helper functions was recently highlighted by Cynthia Huang -->
+
+
+
+<!-- * many *extensions* of ggplot2 actually just *use* ggplot2. Trying to expose the grammar makes the design of your plotting function worse, harder to learn, use, and maintain. -->
+
+<!-- * Why wrappers? it's easier. ggproto is hard? designing extensions is hard? -->
+
+<!-- * Refer to Cynthia's recent post highlighting 'grammar arguments' -->
+
+### Grammar extensions for ggplot2
+
+Contrary to plot helpers, grammar extensions are all about *how* something is plotted using composable visualisation elements. These extension functions directly add to the ggplot2 grammar with new geometries, statistics, coordinates, scales, themes and/or more. The key advantage of directly extending the grammar is that the added functionality can be used to create any number of plots in combination with other grammar elements (including from other extension packages).
+
+<!-- Design difficulties - modular design -->
+Grammar extensions can be more difficult to implement than plot helper functions, since they involve understanding the inner workings or ggplot2^[The [*Extending ggplot2*](https://ggplot2.tidyverse.org/articles/extending-ggplot2.html) vignette is a good place to start learning the ggproto extension system.] rather than simply how ggplot2 is used. Designing grammar extensions also require an understanding of how various plot elements work together. Well designed grammar extension functions are highly modular, making them compatible with other plot elements from ggplot2 and extension packages. This composable grammar-based design is what allows ggplot2 to create any number of plots by reusing grammar elements in different ways.
+
+<!-- Similar design problems with helper plots -->
+<!-- * Trying to do too much, ending up with less modular and less re-usable design -->
+<!-- * geom/stat -->
+
+Grammar extensions often have the opposite design problems as plot helper functions. In attempts to be more helpful and easy to use, grammar extensions compound multiple elements of the grammar. This makes the extensions less modular and reusable in creating other plots. This is commonly seen in the design of geometries (`geom_*()`) and statistics (`stat_*()`), which are coupled together in ggplot2 as layers. An example of this is `geom_histogram()`, which is actually a `geom_bar()`^[Further than that, `geom_bar()` is a special case of `geom_rect()`.] with a `stat_bin()` statistic[^piecharts]. This *helpful* histogram 'geometry' is less reusable as a modular component in other plots, and potentially adds confusion between similar geometries. Creating histograms as binned bar charts invites thinking about other geometries which could show binned counts, or how other statistics can be used to show proportions instead of counts.
+
+[^piecharts]: This is also why we don't have a `geom_piechart()`, since it would involve both a bar geometry and polar coordinate elements.
+
+<!-- Maybe add something about pie charts relating to bars in polar coordinates -->
+
+## Design story of forecast visualisation
+
+
+<!-- ### Conclude comparison -->
+
+<!-- * Designing useful graphics functions with ggplot2  -->
+
+<!-- Comparison with plot helpers -->
+<!-- * Both are useful for different purposes -->
+
+In my package design experience, I find that the best plot helpers are simple/helpful for creating a specific plot, and ggplot2 extensions are modular/flexible as a single element in a wider grammar.
+
+<!-- Modular/flexible <> Helpful/simple -->
+### Helpful plots for forecast visualisation
+
+When creating new plotting functions I often start with creating plot helpers, using existing ggplot2 elements and data pre-processing to construct a new plot which is somewhat complicated to create directly with ggplot2. An example of this is when I created an `autoplot()` function^[`autoplot()` is a ggplot2 function for creating plot helpers for a specific object class.] for the forecast package's forecast plots.
+
+```{r forecastplot}
+#| message: false
+library(forecast)
+wine_fc <- hw(wineind, h=48)
+autoplot(wine_fc)
+```
+
+<!-- * my experience from wrapper to extension and back to wrapper. -->
+This `autoplot()` method originally re-organised a `forecast` object into a data frame for plotting, and used a carefully constructed ribbon geometry (`geom_ribbon()`) to layer the forecast intervals atop one another (along with `geom_line()` for the point forecast).
+
+### New plot elements for forecast uncertainty
+
+This plot helper function met the needs for visualising forecasts for a while, but eventually came the need for visualising forecasts in different ways with different styles. Rather than adding additional arguments options for `autoplot.forecast()` to create completely different plots in with different visual appearance, I instead created a modular forecast geometry `geom_forecast()` which can be used to create any plot. I also created a forecast statistic, `stat_forecast()`, to also calculate forecasts by default much like `geom_smooth()` calculates a smooth line through the data^[As mentioned earlier with `geom_histogram()` I think more separation between geometry and statistic is a better design than what I previously created with `geom_forecast()`.].
+
+```{r forecastgeom}
+library(ggplot2)
+wineind |> 
+  ggplot(aes(x=x, y=y)) + 
+  geom_line() + 
+  geom_forecast(h = 48)
+```
+
+After creating `geom_forecast()` ggplot2 extension, I then was able to vastly simplify the plot helper's code by using this new forecast geometry. This approach of creating both plot helpers and ggplot2 extensions allows for both:
+
+1. A quick and simple plot helper function for looking at data in an analysis.
+2. A flexible and modular ggplot2 extension that is reusable to create many plots with different structure and style.
+
+### Iterated improvements in visualising uncertainty
+
+<!-- Current design, ggdist and distributional -->
+Several incremental design and implementation improvements have been made for visualising forecasts since first creating the plot helpers and grammar extensions described above. The fable package^[The tidy/rectangular successor to the forecast package.] for forecasting still offers the same quick and easy `autoplot()` function for plotting forecasts:
+
+```{r fableplot}
+#| message: false
+library(tsibble)
+library(fable)
+wine_tsbl <- as_tsibble(wineind)
+wine_fbl <- wine_tsbl |> 
+  model(ETS(value)) |> 
+  forecast(h = 48)
+wine_fbl |> 
+  autoplot(wine_tsbl)
+```
+
+However the visualisation of forecasts is now built up with smaller and more modular components. In particular, the forecast object (a *fable*) is now rectangular and ready to use directly with ggplot2 and other tidy/rectangular functions.
+
+```{r fable}
+wine_fbl
+```
+
+Most importantly is that the forecasts are represented with distributions (via the [distributional](https://pkg.mitchelloharawild.com/distributional/) package), which can be directly visualised with ggplot2 (via the [ggdist](https://mjskay.github.io/ggdist/) package). The ggdist package provides several statistics (`stat_*()`) which allow you to use distributions in ggplot2 via the `dist` argument.
+
+```{r ggdist}
+library(ggdist)
+wine_fbl |>  
+  ggplot(aes(x = index)) + 
+  # Past data
+  geom_line(aes(y = value), data = wine_tsbl) + 
+  # Forecasts
+  stat_lineribbon(aes(dist = value, fill_ramp = after_stat(.width)), 
+                  fill = "steelblue", colour = "steelblue",
+                  linewidth = 0.4, .width = c(0.8, 0.95)) +
+  scale_fill_ramp_continuous(limits = c(0.7, 1), range = c(1, 0))
+```
+
+It is more complicated to create this plot since it requires decisions than you might expect - colours, scales, sizing and more. However thinking about visualising distributions with modular grammar components also allows you to switch out geometries to visualise forecasts differently.
+
+```{r ggdist-alt}
+head(wine_fbl, 12) |> 
+  ggplot(aes(x = index)) + 
+  # Past data
+  geom_line(aes(y = value), data = tail(wine_tsbl, 36)) + 
+  # Forecasts
+  stat_halfeye(aes(dist = value), size = 0.5, 
+               colour = "steelblue", fill = "#82c3f2") + 
+  geom_line(aes(y = .mean), colour = "steelblue")
+```
+
+Visualising distributions with ggdist are not limited to forecasting, and by designing extensions to be more modular (and consequently, do less) they can be reused more widely. 
+
+## Conclusion
+
+While creating, learning and using grammar elements is harder than plot helper functions, they allow you to create more visually beautiful and analytically useful graphics. Good design of these grammar elements enables their reusability in making any style of plot for any purpose.
+
+Plot helpers can't possibly create the perfect visualisation for your analysis - and they shouldn't try to^[I'm pleased to see others take on this belief in these great Stack Overflow answers: <https://stackoverflow.com/questions/78512507/stop-fabletools-autoplot-from-using-color-aesthetic-for-models-when-faceting>]. Attempts to make helper functions do more make them harder to learn and use^[This is especially evident in Cynthia Huang's comparison of [three calendar plot helper variants](https://www.cynthiahqy.com/posts/ggplot-wrapper-design/#same-same-but-very-different-variation-in-helper-interfaces)]. To keep plot helper functions simple, I refuse to add extra options for changing the style of the plot even if it is easy to do so.
+
+<!-- For more bespoke visualisation it is better to directly use ggplot2 and think more about the plot elements that best suit your needs. -->

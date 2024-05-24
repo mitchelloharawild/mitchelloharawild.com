@@ -1,6 +1,7 @@
 /* css styles */
 img.hex{
   float: right;
+  width: 120px;
   border-radius: 0;
   -webkit-box-shadow: 0 0;
   margin: 1rem 1rem;

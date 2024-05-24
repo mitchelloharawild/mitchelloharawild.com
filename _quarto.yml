@@ -3,6 +3,8 @@ project:
 
 website:
   title: Mitchell O'Hara-Wild
+  description: "Personal website and blog of Mitchell O'Hara-Wild"
+  site-url: "https://mitchelloharawild.com/"
   navbar:
     left:
       - href: index.qmd

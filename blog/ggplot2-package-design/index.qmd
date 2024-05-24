@@ -1,6 +1,6 @@
 ---
-title: Why I refuse to add style options to my ggplot2 plot functions
-description: 'Designing plot helper and grammar extension functions for ggplot2, and how good design helps you make better plots.'
+title: Why I don't add style options to my ggplot2 functions
+description: 'Plot helper and grammar extension functions for ggplot2, and how good design helps you make better plots.'
 date: today
 categories:
   - ggplot2

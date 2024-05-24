@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mitchell O’Hara-Wild">
-<meta name="dcterms.date" content="2019-09-30">
-<meta name="description" content="Forecasting models for tidy time series">
+<meta name="dcterms.date" content="2024-05-25">
+<meta name="description" content="Designing plot helper and grammar extension functions for ggplot2, and how good design helps you make better plots.">
 
-<title>Mitchell O’Hara-Wild - Extension and wrapper packages of ggplot2</title>
+<title>Mitchell O’Hara-Wild - Why I refuse to add style options to my ggplot2 plot functions</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -144,16 +144,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Extension and wrapper packages of ggplot2</h1>
+      <h1 class="title">Why I refuse to add style options to my ggplot2 plot functions</h1>
                   <div>
         <div class="description">
-          Forecasting models for tidy time series
+          Designing plot helper and grammar extension functions for ggplot2, and how good design helps you make better plots.
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">release</div>
-                <div class="quarto-category">time series</div>
-                <div class="quarto-category">tidyverse</div>
+                <div class="quarto-category">ggplot2</div>
+                <div class="quarto-category">packages</div>
               </div>
                   </div>
   </div>
@@ -171,14 +170,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">September 30, 2019</p>
+        <p class="date">May 25, 2024</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">May 1, 2024</p>
+        <p class="date-modified">May 25, 2024</p>
       </div>
     </div>
       
@@ -193,18 +192,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#fable-forecasting-with-tables" id="toc-fable-forecasting-with-tables" class="nav-link active" data-scroll-target="#fable-forecasting-with-tables">fable: forecasting with tables</a></li>
-  <li><a href="#forecasting-with-fable" id="toc-forecasting-with-fable" class="nav-link" data-scroll-target="#forecasting-with-fable">Forecasting with fable</a>
+  <li><a href="#design-patterns-of-ggplot2-extensions" id="toc-design-patterns-of-ggplot2-extensions" class="nav-link active" data-scroll-target="#design-patterns-of-ggplot2-extensions">Design patterns of ggplot2 extensions</a>
   <ul class="collapse">
-  <li><a href="#data-manipulation-and-exploration" id="toc-data-manipulation-and-exploration" class="nav-link" data-scroll-target="#data-manipulation-and-exploration">Data manipulation and exploration</a></li>
-  <li><a href="#model-specification" id="toc-model-specification" class="nav-link" data-scroll-target="#model-specification">Model specification</a></li>
-  <li><a href="#model-estimation" id="toc-model-estimation" class="nav-link" data-scroll-target="#model-estimation">Model estimation</a></li>
-  <li><a href="#producing-forecasts" id="toc-producing-forecasts" class="nav-link" data-scroll-target="#producing-forecasts">Producing forecasts</a></li>
-  <li><a href="#choosing-the-best-model" id="toc-choosing-the-best-model" class="nav-link" data-scroll-target="#choosing-the-best-model">Choosing the best model</a></li>
-  <li><a href="#scaling-it-up" id="toc-scaling-it-up" class="nav-link" data-scroll-target="#scaling-it-up">Scaling it up</a></li>
+  <li><a href="#plot-helpers-using-ggplot2" id="toc-plot-helpers-using-ggplot2" class="nav-link" data-scroll-target="#plot-helpers-using-ggplot2">Plot helpers using ggplot2</a></li>
+  <li><a href="#grammar-extensions-for-ggplot2" id="toc-grammar-extensions-for-ggplot2" class="nav-link" data-scroll-target="#grammar-extensions-for-ggplot2">Grammar extensions for ggplot2</a></li>
   </ul></li>
-  <li><a href="#extensibility-with-fabletools" id="toc-extensibility-with-fabletools" class="nav-link" data-scroll-target="#extensibility-with-fabletools">Extensibility with fabletools</a></li>
-  <li><a href="#read-more-about-fable" id="toc-read-more-about-fable" class="nav-link" data-scroll-target="#read-more-about-fable">Read more about fable</a></li>
+  <li><a href="#design-story-of-forecast-visualisation" id="toc-design-story-of-forecast-visualisation" class="nav-link" data-scroll-target="#design-story-of-forecast-visualisation">Design story of forecast visualisation</a>
+  <ul class="collapse">
+  <li><a href="#helpful-plots-for-forecast-visualisation" id="toc-helpful-plots-for-forecast-visualisation" class="nav-link" data-scroll-target="#helpful-plots-for-forecast-visualisation">Helpful plots for forecast visualisation</a></li>
+  <li><a href="#new-plot-elements-for-forecast-uncertainty" id="toc-new-plot-elements-for-forecast-uncertainty" class="nav-link" data-scroll-target="#new-plot-elements-for-forecast-uncertainty">New plot elements for forecast uncertainty</a></li>
+  <li><a href="#iterated-improvements-in-visualising-uncertainty" id="toc-iterated-improvements-in-visualising-uncertainty" class="nav-link" data-scroll-target="#iterated-improvements-in-visualising-uncertainty">Iterated improvements in visualising uncertainty</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -215,467 +214,394 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p><img src="fable.png" class="hex"></p>
-<p>The <a href="http://fable.tidyverts.org/">fable package</a> bridges the gap between popular tidy data analysis workflows and time series forecasting. Using tidy temporal data from <a href="https://earo.me/">Earo Wang</a>’s <a href="https://tsibble.tidyverts.org/">tsibble package</a>, fable allows complex forecasting tasks to be performed with ease. The package is the next iteration of <a href="https://robjhyndman.com/">Rob Hyndman</a>’s <a href="http://pkg.robjhyndman.com/forecast/">forecast package</a>, providing the tools and extensibility support needed to overcome current and future time series challenges. I’m ecstatic to announce that the fable package is now available on CRAN! So whether you’re a seasoned forecasting fanatic or you’re making your first foray into forecasting, getting started is easier than ever:</p>
+<p><img src="ggplot2.svg" class="hex img-fluid"></p>
+<!-- ## Can you add this? no! -->
+<p>I develop many packages with functions that use <a href="https://ggplot2.tidyverse.org/">ggplot2</a> to make a specific plot, and I’m often asked if I could add new arguments for changing the style, appearance, or layout of the plot. My answer is <em>almost always</em><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> a resounding <strong><em>no!</em></strong>, followed by encouragement to make the plot themselves without the plot helper function.</p>
+<!-- For example, changing the colour of the horizontal average lines in a seasonal subseries plot. -->
+<p>This outright refusal to implement easy plot <em>improvements</em> might surprise users and seem harsh - after all it is easy to add an argument for changing plot colours thanks to ggplot2’s grammar-based design.</p>
+<p>Why do I refuse to make these easy improvements? It’s a matter of design.</p>
+<!-- along with some functions which extend ggplot2 with new geometries -->
+<!-- * asked to add new features for changing style / appearance of `autoplot()` or `gg_*()` functions - but I say no, why? (I've even asked myself to do this! https://github.com/tidyverts/feasts/issues/134), https://github.com/tidyverts/feasts/issues/109 -->
+<!-- * sometimes I have added arguments for changing the line colour, but later regret it (possibly introducing breaking changes through removing option). -->
+<!-- * these features are easy to add thanks to the grammar in ggplot2 - but it's hard to design a wrapper which exposes the grammar -->
+<!--- To understand what I mean by design, let me briefly cover two common ggplot2 design patterns --->
+<section id="design-patterns-of-ggplot2-extensions" class="level2">
+<h2 class="anchored" data-anchor-id="design-patterns-of-ggplot2-extensions">Design patterns of ggplot2 extensions</h2>
+<p><em>Extension</em><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> functions of ggplot2 can be categorised into two distinct groups:</p>
+<ol type="1">
+<li><p>Functions which <em>use</em> ggplot2 (plot helpers)</p>
+<p>These functions produce a specific plot with a single function, useful for quickly creating a common plot for the data or analysis.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Example: `autoplot()` for time-series plots">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: <code>autoplot()</code> for time-series plots
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"fable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="fable-forecasting-with-tables" class="level1">
-<h1>fable: forecasting with tables</h1>
-<p>A major difference between <em>fable</em> and its predecessor <em>forecast</em> is the way in which time series data is stored. A substantial <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">source of confusion</a> for <em>forecast</em> package users is the creation and use of <code>ts</code> objects. The <em>fable</em> package is built upon the <em>tsibble</em> package, which (as the name suggests) is a <code>tibble</code> with time series structure. Among many benefits, the data is now in the same structure provided in most data files. This makes loading time series data into R a breeze (and less error-prone), as the column of data specifying the observation’s measurement time is now actually used in the data! Other benefits of a tabular data structure include integration with non-temporal packages and support for multiple time series with mixed measurement types.</p>
-<blockquote class="blockquote">
-<p>A fable is never true, but it tells you something important about reality - and that’s what a forecast is.</p>
-<p><em>Rob Hyndman (2018-06-21)</em></p>
-<p>New York Open Statistical Programming Meetup (https://youtu.be/yx6OQ-8HofU?t=2484)</p>
-</blockquote>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="fable-nyhackr.png" class="img-fluid figure-img"></p>
-<figcaption>Rob Hyndman introducing fable to the nyhackr group</figcaption>
-</figure>
-</div>
-<p>The fable package has been actively developed over the past two years, and has undergone a couple of substantial revisions to the interface prior to release. Despite these changes the package’s goals have remained constant:</p>
-<ul>
-<li>Seamlessly integrate within a tidy data analysis workflow.</li>
-<li>Provide a consistent, intuitive and familiar interface for time series modelling.</li>
-<li>Simple forecasting (and reconciliation) of many related time series.</li>
-<li>Encourage extensibility by developing general forecasting tools.</li>
-<li>Provide forecasts with distributions, not intervals.</li>
-<li>Naturally support sub-daily and high frequency data with complex structures.</li>
-</ul>
-<p>The first release of fable implements all of these goals and more. While this post won’t cover the details of how these goals are achieved, I hope that the forecasting example below illustrates how these goals have been realised for forecasting in practice. I have no doubt that there will be many more blog posts which will explore fable in greater detail.</p>
-</section>
-<section id="forecasting-with-fable" class="level1">
-<h1>Forecasting with fable</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tsibble)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>To see how fable can be applied to real forecasting problems we’ll create some simple forecasts of Australia’s domestic tourism. This is the same dataset analysed in the <a href="../feasts"><em>Introducing feasts</em></a> post, which provides a visual introduction to the data using the closely related <a href="http://feasts.tidyverts.org/">feasts package</a>.</p>
-<section id="data-manipulation-and-exploration" class="level3">
-<h3 class="anchored" data-anchor-id="data-manipulation-and-exploration">Data manipulation and exploration</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tourism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 24,320 x 5 [1Q]
-# Key:       Region, State, Purpose [304]
-   Quarter Region   State           Purpose  Trips
-     &lt;qtr&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;chr&gt;    &lt;dbl&gt;
- 1 1998 Q1 Adelaide South Australia Business  135.
- 2 1998 Q2 Adelaide South Australia Business  110.
- 3 1998 Q3 Adelaide South Australia Business  166.
- 4 1998 Q4 Adelaide South Australia Business  127.
- 5 1999 Q1 Adelaide South Australia Business  137.
- 6 1999 Q2 Adelaide South Australia Business  200.
- 7 1999 Q3 Adelaide South Australia Business  169.
- 8 1999 Q4 Adelaide South Australia Business  134.
- 9 2000 Q1 Adelaide South Australia Business  154.
-10 2000 Q2 Adelaide South Australia Business  169.
-# ℹ 24,310 more rows</code></pre>
-</div>
-</div>
-<p>This dataset contains quarterly domestic overnight trips for a variety of locations and purposes around Australia. When disaggregated by the key variables (Region, State and Purpose), we have a total of 304 separate time series to forecast.</p>
-<p>Let’s start simple and use <a href="https://dplyr.tidyverse.org/">dplyr</a> to calculate the total overnight domestic trips for Australia.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tourism_aus <span class="ot">&lt;-</span> tourism <span class="sc">%&gt;%</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trips =</span> <span class="fu">sum</span>(Trips))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>tourism_aus</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 80 x 2 [1Q]
-   Quarter  Trips
-     &lt;qtr&gt;  &lt;dbl&gt;
- 1 1998 Q1 23182.
- 2 1998 Q2 20323.
- 3 1998 Q3 19827.
- 4 1998 Q4 20830.
- 5 1999 Q1 22087.
- 6 1999 Q2 21458.
- 7 1999 Q3 19914.
- 8 1999 Q4 20028.
- 9 2000 Q1 22339.
-10 2000 Q2 19941.
-# ℹ 70 more rows</code></pre>
-</div>
-</div>
-<p>At minimum, we should plot the data before considering a model for it. A tsibble dataset works seamlessly with <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, allowing you to design informative graphics for this data. For a quick look at the data we also support <code>autoplot()</code> functionality (and more time series plots discussed in <a href="../feasts"><em>Introducing feasts</em></a>).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tourism_aus <span class="sc">%&gt;%</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(Trips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fable)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>tsibble<span class="sc">::</span><span class="fu">as_tsibble</span>(USAccDeaths) <span class="sc">|&gt;</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/tourism-plot-1.png" class="img-fluid figure-img" width="816"></p>
+<p><img src="index_files/figure-html/timeplot-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>The first step to forecasting this data would be to identify appropriate model(s). A seasonal model would be required as the data shows signs of seasonality. Including trend would also be helpful, although as the trend has changed over time (becoming positive after 2010) our model will need to support this too. Considering this, an <a href="https://otexts.com/fpp3/ets.html">exponential smoothing model</a> may be suitable for this data.</p>
+</div>
+</div>
+</div></li>
+<li><p>Functions which <em>extend</em> ggplot2 (grammar extensions)</p>
+<p>These functions add to the plotting grammar available in ggplot2, and are highly customisable and versatile. On their own, grammar extension functions don’t produce plots but rather plot elements - plots are constructed using a combination of plot elements.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Example: `ggrepel::geom_text_repel()`">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: <code>ggrepel::geom_text_repel()</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mtcars, <span class="fu">aes</span>(wt, mpg, <span class="at">label =</span> <span class="fu">rownames</span>(mtcars))) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>() <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">'red'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/textrepel-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></li>
+</ol>
+<!-- Both types of functions are useful but serve different purposes, and therefore should have different software designs. -->
+<p>Plot helpers and ggplot2 extension functions are both useful, but serve different purposes in an analysis <!-- workflow--->. The design tendency of doing too much can make these functions less useful for their purpose. In particular for ggplot2 extension packages, it is common to make plot helpers more extensible and ggplot2 extensions more helpful.</p>
+<p>Why does this become a design problem? Read on…</p>
+<!-- In many ggplot2 extension packages I see each group attempt to incorporate designs of the other. Plot helper functions that use ggplot2 attempt to add style customisation by exposing the grammar and single grammar extension functions attempt to do the work of many. -->
+<!-- TODO: Rephrase this paragraph, add emphasis on why I refuse for design purposes -->
+<!-- Aside: these design considerations apply not just to ggplot2 extensions but designing good composable abstractions and wrapper functions -->
+<!-- * in defence of plotting functions in the context of extending the grammar - many people dislike `autoplot()` and other single-plot helper functions, I disagree. -->
+<!-- Types of 'extensions' for ggplot2 -->
+<!-- * 'wrapper' functions which use ggplot2 -->
+<!-- * extensions of ggplot2 with ggproto -->
+<section id="plot-helpers-using-ggplot2" class="level3">
+<h3 class="anchored" data-anchor-id="plot-helpers-using-ggplot2">Plot helpers using ggplot2</h3>
+<p>Plot helper functions use many ggplot2 elements together into a simple function for creating a specific graphic. These functions abstract away the grammar of graphics, and their design should focus on <em>what</em> is being plotted (the data and its patterns) rather than <em>how</em> (the geometries, aesthetic mappings, and more).</p>
+<p>Take for example the <code>feasts::gg_season()</code> function for plotting a seasonal plot of time-series data, which is commonly used in a time-series analysis to understand the shape of the seasonality (identifying peak times from throughs).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tsibble)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tsibble</span>(USAccDeaths) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  feasts<span class="sc">::</span><span class="fu">gg_season</span>(<span class="at">y =</span> value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/seasonplot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Functions like these are really useful during an analysis, allowing a quick peek at the data without needing to repeatedly write the same grammar elements (expand below) each and every time.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Reproduction of above plot without gg_season()">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reproduction of above plot without gg_season()
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>tsibble<span class="sc">::</span><span class="fu">as_tsibble</span>(USAccDeaths) <span class="sc">|&gt;</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">month</span>(index), <span class="at">y =</span> value, <span class="at">colour =</span> <span class="fu">factor</span>(<span class="fu">year</span>(index)))) <span class="sc">+</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>() <span class="sc">+</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="at">labels =</span> month.abb) <span class="sc">+</span> </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Accidental deaths in the USA"</span>, <span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">colour =</span> <span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/seasonplot-diy-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- The design of `gg_season()` highlights *what* is being visualised, with minimal options to change *how* the plot is made: -->
+<!-- ```{r} -->
+<!-- #| eval: false -->
+<!-- gg_season( -->
+<!--   data, -->
+<!--   y = NULL, -->
+<!--   period = NULL, -->
+<!--   facet_period = NULL, -->
+<!--   max_col = Inf, -->
+<!--   max_col_discrete = 7, -->
+<!--   pal = (scales::hue_pal())(9), -->
+<!--   polar = FALSE, -->
+<!--   labels = c("none", "left", "right", "both"), -->
+<!--   labels_repel = FALSE, -->
+<!--   labels_left_nudge = 0, -->
+<!--   labels_right_nudge = 0, -->
+<!--   ... -->
+<!-- ) -->
+<!-- ``` -->
+<p>The handling of the x-axis wrapping and line grouping/colouring is combined/abstracted as the seasonal <code>period</code>. Similar plot-specific abstraction is done for faceting seasons with <code>facet_period</code> allowing for quick and informative plots.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fill_gaps</span>(pedestrian) <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Sensor <span class="sc">==</span> <span class="st">"Southern Cross Station"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  feasts<span class="sc">::</span><span class="fu">gg_season</span>(<span class="at">y =</span> Count, <span class="at">period =</span> <span class="st">"day"</span>, <span class="at">facet_period =</span> <span class="st">"1 weeks"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/facetseasonplot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Reproduction of above plot without gg_season()">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Reproduction of above plot without gg_season()
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fill_gaps</span>(pedestrian) <span class="sc">|&gt;</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Sensor <span class="sc">==</span> <span class="st">"Southern Cross Station"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">hour</span>(Date_Time), <span class="at">y =</span> Count, <span class="at">colour =</span> <span class="fu">as.Date</span>(Date_Time), <span class="at">group =</span> <span class="fu">as.Date</span>(Date_Time))) <span class="sc">+</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>() <span class="sc">+</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">cols =</span> <span class="fu">vars</span>(<span class="fu">wday</span>(Date_Time, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>, <span class="at">week_start =</span> <span class="dv">1</span>))) <span class="sc">+</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> scales<span class="sc">::</span><span class="fu">hue_pal</span>()(<span class="dv">9</span>), <span class="at">labels =</span> \(x) <span class="fu">as.Date</span>(x, <span class="at">origin =</span> <span class="st">"1970-01-01"</span>)) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Pedestrians at Southern Cross Station"</span>, <span class="at">x =</span> <span class="st">"Hour"</span>, <span class="at">colour =</span> <span class="st">"Date"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/facetseasonplot-diy-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>While useful, these plots aren’t the prettiest - they don’t try to be. Seasonal plots as shown above are unlikely to be readily suitable for wider publication, and the necessary improvements aren’t limited to the theme and style. A useful similar alternative is using box-plots rather than lines to more clearly show the typical number of pedestrians throughout the day. Creating beautiful publication ready graphics involves more than simply using a suitable chart type and variables, but also carefully considering the layout, colours, and typography<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<p>By not adding stylistic options to my plot helper functions, I hope to encourage users to think more creatively when constructing their visualisation. Not just using prettier colours or themes, but also creating more suitable chart types for better reader comprehension. After all, these plots are intended for experienced analysts to quickly preview important features of the data. They are aren’t intended to be readily understood by an untrained reader.</p>
+<p><a href="https://www.cynthiahqy.com/">Cynthia Huang</a>’s companion blog post <a href="https://www.cynthiahqy.com/posts/ggplot-wrapper-design"><em>Layer arguments for ggplot2 wrapper functions</em></a> highlights the difficulty in creating plot helper functions which also expose the underlying grammar for further plot customisation. This design challenge is not specific to ggplot2 extensions, but more broadly applicable to any functions which abstract complexity away from underlying functions. The post offers a clever alternative that allows full plot customisation without adding countless style arguments which re-introduce complexity to an abstraction.</p>
+<!-- Perhaps improve final message from this - possibly showing other helper functions which try to be extra helpful with many style arguments -->
+<!-- design difficulties of creating plot helper functions that also expose the grammar for further user customisation. -->
+<!-- Another reason against adding additional style arguments to plot helper functions was recently highlighted by Cynthia Huang -->
+<!-- * many *extensions* of ggplot2 actually just *use* ggplot2. Trying to expose the grammar makes the design of your plotting function worse, harder to learn, use, and maintain. -->
+<!-- * Why wrappers? it's easier. ggproto is hard? designing extensions is hard? -->
+<!-- * Refer to Cynthia's recent post highlighting 'grammar arguments' -->
 </section>
-<section id="model-specification" class="level3">
-<h3 class="anchored" data-anchor-id="model-specification">Model specification</h3>
-<p>Model specification in fable supports a formula based interface (much like <code>lm()</code> and other cross-sectional modelling functions). A model formula in R is expressed using <code>response ~ terms</code>, where the formula’s left side describes the response (and any transformations), while the right describes terms used to model the response. The terms of a fable model often include model specific functions called ‘specials’. They describe how the time series dynamics are captured by the model, and the supported specials can be found in the method’s help file.</p>
-<p>Exponential smoothing models are defined using the <a href="http://fable.tidyverts.org/reference/ETS.html"><code>ETS()</code></a> function, which provides ‘specials’ for controlling the <code>error()</code>, <code>trend()</code> and <code>season()</code>. These time series elements appear to be additively combined to give the response, and so an appropriate model specification may be:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ETS</span>(Trips <span class="sc">~</span> <span class="fu">error</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">trend</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">season</span>(<span class="st">"A"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Identifying an appropriate model specification can be tricky as it requires some background knowledge about temporal patterns and ETS models. Don’t be discouraged! If your unsure, you can let <code>ETS()</code> and other models automatically choose the best specification if multiple options are provided. So if you can’t tell if the seasonality is additive (<code>season("A")</code>) or multiplicative (<code>season("M")</code>), you can let fable decide via:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ETS</span>(Trips <span class="sc">~</span> <span class="fu">error</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">trend</span>(<span class="st">"A"</span>) <span class="sc">+</span> <span class="fu">season</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"M"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>In fact this automatic selection is the default option. If the <code>season()</code> special is not specified (excluded entirely from formula), the seasonal structure will be automatically chosen as either none, additive or multiplicative seasonality with <code>season(c("N", "A", "M"))</code>. Automatic selection also occurs when <code>error()</code> and <code>trend()</code> are not specified, allowing an appropriate ETS model to be determined fully automatically with:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ETS</span>(Trips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="grammar-extensions-for-ggplot2" class="level3">
+<h3 class="anchored" data-anchor-id="grammar-extensions-for-ggplot2">Grammar extensions for ggplot2</h3>
+<p>Contrary to plot helpers, grammar extensions are all about <em>how</em> something is plotted using composable visualisation elements. These extension functions directly add to the ggplot2 grammar with new geometries, statistics, coordinates, scales, themes and/or more. The key advantage of directly extending the grammar is that the added functionality can be used to create any number of plots in combination with other grammar elements (including from other extension packages).</p>
+<!-- Design difficulties - modular design -->
+<p>Grammar extensions can be more difficult to implement than plot helper functions, since they involve understanding the inner workings or ggplot2<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> rather than simply how ggplot2 is used. Designing grammar extensions also require an understanding of how various plot elements work together. Well designed grammar extension functions are highly modular, making them compatible with other plot elements from ggplot2 and extension packages. This composable grammar-based design is what allows ggplot2 to create any number of plots by reusing grammar elements in different ways.</p>
+<!-- Similar design problems with helper plots -->
+<!-- * Trying to do too much, ending up with less modular and less re-usable design -->
+<!-- * geom/stat -->
+<p>Grammar extensions often have the opposite design problems as plot helper functions. In attempts to be more helpful and easy to use, grammar extensions compound multiple elements of the grammar. This makes the extensions less modular and reusable in creating other plots. This is commonly seen in the design of geometries (<code>geom_*()</code>) and statistics (<code>stat_*()</code>), which are coupled together in ggplot2 as layers. An example of this is <code>geom_histogram()</code>, which is actually a <code>geom_bar()</code><a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> with a <code>stat_bin()</code> statistic<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. This <em>helpful</em> histogram ‘geometry’ is less reusable as a modular component in other plots, and potentially adds confusion between similar geometries. Creating histograms as binned bar charts invites thinking about other geometries which could show binned counts, or how other statistics can be used to show proportions instead of counts.</p>
+<!-- Maybe add something about pie charts relating to bars in polar coordinates -->
 </section>
-<section id="model-estimation" class="level3">
-<h3 class="anchored" data-anchor-id="model-estimation">Model estimation</h3>
-<p>A model is estimated using the <code>model()</code> function, which uses a dataset to train one or more specified models.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_aus <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="at">auto_ets =</span> <span class="fu">ETS</span>(Trips))</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A mable: 1 x 1
-      auto_ets
-       &lt;model&gt;
-1 &lt;ETS(A,A,A)&gt;</code></pre>
-</div>
-</div>
-<p>The resulting mable (model table) object informs us that an ETS(A,A,A) model has been automatically selected. Within that cell a complete description of the model is stored, including everything needed to produce forecasts (such as estimated coefficients). The <code>report()</code> function can be used if the mable contains only one model, which provides a familiar display of the models estimates and summary measures.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">report</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Series: Trips 
-Model: ETS(A,A,A) 
-  Smoothing parameters:
-    alpha = 0.4495675 
-    beta  = 0.04450178 
-    gamma = 0.0001000075 
-
-  Initial states:
-     l[0]      b[0]      s[0]     s[-1]     s[-2]    s[-3]
- 21689.64 -58.46946 -125.8548 -816.3416 -324.5553 1266.752
-
-  sigma^2:  699901.4
-
-     AIC     AICc      BIC 
-1436.829 1439.400 1458.267 </code></pre>
-</div>
-</div>
-<p>The package also supports verbs from the <a href="https://broom.tidyverse.org/">broom package</a>, allowing you to <code>tidy()</code> your coefficients, <code>glance()</code> your model summary statistics, and <code>augment()</code> your data with predictions. These verbs provide convenient and consistent methods for accessing useful values from an estimated model.</p>
 </section>
-<section id="producing-forecasts" class="level3">
-<h3 class="anchored" data-anchor-id="producing-forecasts">Producing forecasts</h3>
-<p>The <code>forecast()</code> function is used to produce forecasts from estimated models. The forecast horizon (<code>h</code>) is used to specify how far into the future forecasts should be made. <code>h</code> can be specified with a number (the number of future observations) or text (the length of time to predict). You can also specify the time periods to predict using <code>new_data</code>, which allows you to provide a tsibble of future time points to forecast, along with any exogenous regressors which may be required by the model.</p>
+<section id="design-story-of-forecast-visualisation" class="level2">
+<h2 class="anchored" data-anchor-id="design-story-of-forecast-visualisation">Design story of forecast visualisation</h2>
+<!-- ### Conclude comparison -->
+<!-- * Designing useful graphics functions with ggplot2  -->
+<!-- Comparison with plot helpers -->
+<!-- * Both are useful for different purposes -->
+<p>In my package design experience, I find that the best plot helpers are simple/helpful for creating a specific plot, and ggplot2 extensions are modular/flexible as a single element in a wider grammar.</p>
+<!-- Modular/flexible <> Helpful/simple -->
+<section id="helpful-plots-for-forecast-visualisation" class="level3">
+<h3 class="anchored" data-anchor-id="helpful-plots-for-forecast-visualisation">Helpful plots for forecast visualisation</h3>
+<p>When creating new plotting functions I often start with creating plot helpers, using existing ggplot2 elements and data pre-processing to construct a new plot which is somewhat complicated to create directly with ggplot2. An example of this is when I created an <code>autoplot()</code> function<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> for the forecast package’s forecast plots.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fc <span class="ot">&lt;-</span> fit <span class="sc">%&gt;%</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>wine_fc <span class="ot">&lt;-</span> <span class="fu">hw</span>(wineind, <span class="at">h=</span><span class="dv">48</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(wine_fc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/forecastplot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<!-- * my experience from wrapper to extension and back to wrapper. -->
+<p>This <code>autoplot()</code> method originally re-organised a <code>forecast</code> object into a data frame for plotting, and used a carefully constructed ribbon geometry (<code>geom_ribbon()</code>) to layer the forecast intervals atop one another (along with <code>geom_line()</code> for the point forecast).</p>
+</section>
+<section id="new-plot-elements-for-forecast-uncertainty" class="level3">
+<h3 class="anchored" data-anchor-id="new-plot-elements-for-forecast-uncertainty">New plot elements for forecast uncertainty</h3>
+<p>This plot helper function met the needs for visualising forecasts for a while, but eventually came the need for visualising forecasts in different ways with different styles. Rather than adding additional arguments options for <code>autoplot.forecast()</code> to create completely different plots in with different visual appearance, I instead created a modular forecast geometry <code>geom_forecast()</code> which can be used to create any plot. I also created a forecast statistic, <code>stat_forecast()</code>, to also calculate forecasts by default much like <code>geom_smooth()</code> calculates a smooth line through the data<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>wineind <span class="sc">|&gt;</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y=</span>y)) <span class="sc">+</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_forecast</span>(<span class="at">h =</span> <span class="dv">48</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/forecastgeom-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>After creating <code>geom_forecast()</code> ggplot2 extension, I then was able to vastly simplify the plot helper’s code by using this new forecast geometry. This approach of creating both plot helpers and ggplot2 extensions allows for both:</p>
+<ol type="1">
+<li>A quick and simple plot helper function for looking at data in an analysis.</li>
+<li>A flexible and modular ggplot2 extension that is reusable to create many plots with different structure and style.</li>
+</ol>
+</section>
+<section id="iterated-improvements-in-visualising-uncertainty" class="level3">
+<h3 class="anchored" data-anchor-id="iterated-improvements-in-visualising-uncertainty">Iterated improvements in visualising uncertainty</h3>
+<!-- Current design, ggdist and distributional -->
+<p>Several incremental design and implementation improvements have been made for visualising forecasts since first creating the plot helpers and grammar extensions described above. The fable package<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a> for forecasting still offers the same quick and easy <code>autoplot()</code> function for plotting forecasts:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tsibble)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fable)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>wine_tsbl <span class="ot">&lt;-</span> <span class="fu">as_tsibble</span>(wineind)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>wine_fbl <span class="ot">&lt;-</span> wine_tsbl <span class="sc">|&gt;</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(<span class="fu">ETS</span>(value)) <span class="sc">|&gt;</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="dv">48</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>wine_fbl <span class="sc">|&gt;</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(wine_tsbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/fableplot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>However the visualisation of forecasts is now built up with smaller and more modular components. In particular, the forecast object (a <em>fable</em>) is now rectangular and ready to use directly with ggplot2 and other tidy/rectangular functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>wine_fbl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A fable: 8 x 4 [1Q]
+<pre><code># A fable: 48 x 4 [1M]
 # Key:     .model [1]
-  .model   Quarter             Trips  .mean
-  &lt;chr&gt;      &lt;qtr&gt;            &lt;dist&gt;  &lt;dbl&gt;
-1 auto_ets 2018 Q1   N(29068, 7e+05) 29068.
-2 auto_ets 2018 Q2  N(27794, 870750) 27794.
-3 auto_ets 2018 Q3 N(27619, 1073763) 27619.
-4 auto_ets 2018 Q4 N(28627, 1311711) 28627.
-5 auto_ets 2019 Q1 N(30336, 1587455) 30336.
-6 auto_ets 2019 Q2 N(29062, 1903591) 29062.
-7 auto_ets 2019 Q3 N(28887, 2262980) 28887.
-8 auto_ets 2019 Q4 N(29895, 2668392) 29895.</code></pre>
+   .model        index             value  .mean
+   &lt;chr&gt;         &lt;mth&gt;            &lt;dist&gt;  &lt;dbl&gt;
+ 1 ETS(value) 1994 Sep N(24739, 4756552) 24739.
+ 2 ETS(value) 1994 Oct N(26972, 5674061) 26972.
+ 3 ETS(value) 1994 Nov N(31771, 7901147) 31771.
+ 4 ETS(value) 1994 Dec N(37060, 1.1e+07) 37060.
+ 5 ETS(value) 1995 Jan N(16590, 2169674) 16590.
+ 6 ETS(value) 1995 Feb N(21206, 3557682) 21206.
+ 7 ETS(value) 1995 Mar N(23948, 4553053) 23948.
+ 8 ETS(value) 1995 Apr N(25620, 5229329) 25620.
+ 9 ETS(value) 1995 May N(24054, 4625845) 24054.
+10 ETS(value) 1995 Jun N(24662, 4880015) 24662.
+# i 38 more rows</code></pre>
 </div>
 </div>
-<p>You’ll notice that this function gives us a fable (forecast table), which contains point forecasts in the <code>Trips</code> column, and the forecast’s distribution in the <code>.distribution</code> column. If we had specified a transformation in the model specification (say <code>ETS(log(Trips))</code>), the resulting forecasts would be <a href="http://fable.tidyverts.org/articles/transformations.html">automatically back transformed and adjusted for bias</a>.</p>
-<p>While using and storing distributions is powerful, they can be more difficult to interpret than intervals. Forecast intervals can be extracted from a forecast distribution using the <code>hilo()</code> function:</p>
+<p>Most importantly is that the forecasts are represented with distributions (via the <a href="https://pkg.mitchelloharawild.com/distributional/">distributional</a> package), which can be directly visualised with ggplot2 (via the <a href="https://mjskay.github.io/ggdist/">ggdist</a> package). The ggdist package provides several statistics (<code>stat_*()</code>) which allow you to use distributions in ggplot2 via the <code>dist</code> argument.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fc <span class="sc">%&gt;%</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hilo</span>(<span class="at">level =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">95</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 8 x 6 [1Q]
-# Key:       .model [1]
-  .model   Quarter             Trips  .mean                  `80%`
-  &lt;chr&gt;      &lt;qtr&gt;            &lt;dist&gt;  &lt;dbl&gt;                 &lt;hilo&gt;
-1 auto_ets 2018 Q1   N(29068, 7e+05) 29068. [27995.95, 30140.25]80
-2 auto_ets 2018 Q2  N(27794, 870750) 27794. [26597.85, 28989.59]80
-3 auto_ets 2018 Q3 N(27619, 1073763) 27619. [26291.05, 28947.01]80
-4 auto_ets 2018 Q4 N(28627, 1311711) 28627. [27158.76, 30094.28]80
-5 auto_ets 2019 Q1 N(30336, 1587455) 30336. [28721.43, 31950.79]80
-6 auto_ets 2019 Q2 N(29062, 1903591) 29062. [27293.57, 30829.90]80
-7 auto_ets 2019 Q3 N(28887, 2262980) 28887. [26959.18, 30814.90]80
-8 auto_ets 2019 Q4 N(29895, 2668392) 29895. [27801.09, 31987.98]80
-# ℹ 1 more variable: `95%` &lt;hilo&gt;</code></pre>
-</div>
-</div>
-<p>Rather than reading values from a table, it is usually easier to evaluate forecast behaviour by making a plot. Much like plotting a tsibble, we have provided <code>autoplot()</code> and <code>autolayer()</code> methods for plotting forecasts. Unlike the <em>forecast</em> package, <em>fable</em> does not store the original data and fitted model in the <code>fable</code> object, so the historical data must be passed in to see it on the plot.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fc <span class="sc">%&gt;%</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_aus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggdist)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>wine_fbl <span class="sc">|&gt;</span>  </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> index)) <span class="sc">+</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Past data</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> value), <span class="at">data =</span> wine_tsbl) <span class="sc">+</span> </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Forecasts</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_lineribbon</span>(<span class="fu">aes</span>(<span class="at">dist =</span> value, <span class="at">fill_ramp =</span> <span class="fu">after_stat</span>(.width)), </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">fill =</span> <span class="st">"steelblue"</span>, <span class="at">colour =</span> <span class="st">"steelblue"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">linewidth =</span> <span class="fl">0.4</span>, <span class="at">.width =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.95</span>)) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_ramp_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="dv">1</span>), <span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
+<p><img src="index_files/figure-html/ggdist-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-</section>
-<section id="choosing-the-best-model" class="level3">
-<h3 class="anchored" data-anchor-id="choosing-the-best-model">Choosing the best model</h3>
-<p>While <code>ETS()</code> has been able to choose the best ETS model for this data, a different model class may give even better results. The <code>model()</code> function is capable of estimating many specified models. Let’s compare the ETS model with an automatically selected <a href="fable.tidyverts.org/reference/ARIMA.html"><code>ARIMA()</code></a> model (much like <a href="http://pkg.robjhyndman.com/forecast/reference/auto.arima.html"><code>forecast::auto.arima()</code></a>) and a linear model (<a href="http://fable.tidyverts.org/reference/TSLM.html"><code>TSLM()</code></a>) with linear time trend and dummy seasonality.</p>
+<p>It is more complicated to create this plot since it requires decisions than you might expect - colours, scales, sizing and more. However thinking about visualising distributions with modular grammar components also allows you to switch out geometries to visualise forecasts differently.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_aus <span class="sc">%&gt;%</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips),</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">TSLM</span>(Trips <span class="sc">~</span> <span class="fu">trend</span>() <span class="sc">+</span> <span class="fu">season</span>())</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A mable: 1 x 3
-           ets                    arima      lm
-       &lt;model&gt;                  &lt;model&gt; &lt;model&gt;
-1 &lt;ETS(A,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt;  &lt;TSLM&gt;</code></pre>
-</div>
-</div>
-<p>The mable now contains three models, each specified model is stored in a separate column.</p>
-<p>We can produce forecasts and visualise the results using the same code as before. To minimise overplotting I have chosen to only show the 80% forecast interval, and have made the forecasts semi-transparent.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fit <span class="sc">%&gt;%</span> </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_aus, <span class="at">level =</span> <span class="dv">80</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(wine_fbl, <span class="dv">12</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> index)) <span class="sc">+</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Past data</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> value), <span class="at">data =</span> <span class="fu">tail</span>(wine_tsbl, <span class="dv">36</span>)) <span class="sc">+</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Forecasts</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_halfeye</span>(<span class="fu">aes</span>(<span class="at">dist =</span> value), <span class="at">size =</span> <span class="fl">0.5</span>, </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">colour =</span> <span class="st">"steelblue"</span>, <span class="at">fill =</span> <span class="st">"#82c3f2"</span>) <span class="sc">+</span> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .mean), <span class="at">colour =</span> <span class="st">"steelblue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/many-fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
+<p><img src="index_files/figure-html/ggdist-alt-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>It is clear from this plot that the linear model (<code>lm</code>) is unable to capture the trend change at 2010. The linear model could be improved by using a piecewise linear trend with a knot at 2010, but I’ll leave that for you to try (replace <code>trend()</code> with <code>trend(knots = yearquarter("2010 Q1"))</code>).</p>
-<p>Visually distinguishing the best model between ETS and ARIMA is difficult. The ETS model predicts a stronger trend than the ARIMA model, and both produce very similar seasonal patterns.</p>
-<p>To choose the best model we can make use of numerical accuracy measures using the <code>accuracy()</code> function. This function can compute various accuracy measures based on <a href="https://fabletools.tidyverts.org/reference/point_accuracy_measures.html">point forecasts</a>, <a href="https://fabletools.tidyverts.org/reference/interval_accuracy_measures.html">forecast intervals</a> and <a href="https://fabletools.tidyverts.org/reference/distribution_accuracy_measures.html">forecast distributions</a>. It also allows you to specify your own accuracy measure functions.</p>
-<p>Training (in-sample) accuracy will be given when applied to a mable.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">accuracy</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 10
-  .model .type           ME  RMSE   MAE    MPE  MAPE  MASE RMSSE     ACF1
-  &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
-1 ets    Training  1.05e+ 2  794.  604.  0.379  2.86 0.636 0.653 -0.00151
-2 arima  Training  1.54e+ 2  840.  632.  0.584  2.97 0.666 0.691 -0.0432 
-3 lm     Training -1.82e-13 1715. 1436. -0.597  6.67 1.51  1.41   0.816  </code></pre>
-</div>
-</div>
-<p>The in-sample accuracy suggests that the ETS model performs best. This is because it has the lowest values for all accuracy measures (lower values indicate less errors). As expected, the linear model is much worse than the others.</p>
-<p>Forecast (out-of-sample) accuracy will be computed when a fable is used with <code>accuracy()</code>. Note that you will need to withhold a test set to base your accuracy on.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tourism_aus <span class="sc">%&gt;%</span> </span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Withhold the last 3 years before fitting the model</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Quarter <span class="sc">&lt;</span> <span class="fu">yearquarter</span>(<span class="st">"2015 Q1"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate the models on the training data (1998-2014)</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips),</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">TSLM</span>(Trips <span class="sc">~</span> <span class="fu">trend</span>() <span class="sc">+</span> <span class="fu">season</span>())</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Forecast the witheld time peroid (2015-2017)</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"3 years"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute accuracy of the forecasts relative to the actual data </span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(tourism_aus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 10
-  .model .type    ME  RMSE   MAE   MPE  MAPE  MASE RMSSE  ACF1
-  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 arima  Test  1397. 1795. 1452.  5.31  5.54  1.58  1.49 0.496
-2 ets    Test  1895. 2281. 1909.  7.23  7.28  2.08  1.90 0.613
-3 lm     Test  4664. 4822. 4664. 18.1  18.1   5.09  4.01 0.634</code></pre>
-</div>
-</div>
-<p>The out-of-sample accuracy shows that the ARIMA model produced the most accurate forecasts for 2015-2017 using data from 1998-2014.</p>
-<p>So which model is best? In-sample (training) accuracy uses one-step ahead forecast errors from model coefficients based on the whole data. In many senses this is unrealistic, as the forecasts are partially based on information not available when forecasting into the future. Additionally, these forecasts are based only on one-step ahead accuracy, where in practice you may be interested in forecasting a few years ahead.</p>
-<p>Alternatively, out-of-sample (test) accuracy is more akin to the actual forecasting task: predicting the future using only past information. The accuracy is based on forecast errors from three years of data never seen by the model. This advantage is also a problem, as the accuracy is now based on just 12 values, so the performance is more sensitive to chance. Calculating accuracy using <a href="https://otexts.com/fpp3/tscv.html">time series cross-validation</a> overcomes many of these problems, but will take more time to compute.</p>
-<p>In short, both ETS and ARIMA models are producing reasonable forecasts for this data. Instead of choosing a favourite, we can do better by averaging them which usually gives better results.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_aus <span class="sc">%&gt;%</span> </span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">average =</span> (ets <span class="sc">+</span> arima) <span class="sc">/</span> <span class="dv">2</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A mable: 1 x 3
-           ets                    arima       average
-       &lt;model&gt;                  &lt;model&gt;       &lt;model&gt;
-1 &lt;ETS(A,A,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fit <span class="sc">%&gt;%</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_aus, <span class="at">level =</span> <span class="dv">80</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/ensemble-fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="scaling-it-up" class="level3">
-<h3 class="anchored" data-anchor-id="scaling-it-up">Scaling it up</h3>
-<p>Producing forecasts for a single time series isn’t particularly exciting, and certainly doesn’t align well with modern forecasting problems. Suppose we were interested in forecasting tourism for each of Australia’s major states (and territories).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tourism_state <span class="ot">&lt;-</span> tourism <span class="sc">%&gt;%</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(State) <span class="sc">%&gt;%</span> </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Trips =</span> <span class="fu">sum</span>(Trips))</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>tourism_state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tsibble: 640 x 3 [1Q]
-# Key:       State [8]
-   State Quarter Trips
-   &lt;chr&gt;   &lt;qtr&gt; &lt;dbl&gt;
- 1 ACT   1998 Q1  551.
- 2 ACT   1998 Q2  416.
- 3 ACT   1998 Q3  436.
- 4 ACT   1998 Q4  450.
- 5 ACT   1999 Q1  379.
- 6 ACT   1999 Q2  558.
- 7 ACT   1999 Q3  449.
- 8 ACT   1999 Q4  595.
- 9 ACT   2000 Q1  600.
-10 ACT   2000 Q2  557.
-# ℹ 630 more rows</code></pre>
-</div>
-</div>
-<p>The data now contains 8 separate time series, each with different time series characteristics:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tourism_state <span class="sc">%&gt;%</span> </span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(Trips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/tourism-state-plot-1.png" class="img-fluid figure-img" width="816"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>This is where the automatic model selection in <em>fable</em> is particularly useful. The <code>model()</code> function will estimate a specified model to all series in the data, so producing many models is simple.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> tourism_state <span class="sc">%&gt;%</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">model</span>(</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ets =</span> <span class="fu">ETS</span>(Trips),</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">arima =</span> <span class="fu">ARIMA</span>(Trips)</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">average =</span> (ets <span class="sc">+</span> arima)<span class="sc">/</span><span class="dv">2</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A mable: 8 x 4
-# Key:     State [8]
-  State                       ets                    arima       average
-  &lt;chr&gt;                   &lt;model&gt;                  &lt;model&gt;       &lt;model&gt;
-1 ACT                &lt;ETS(M,A,N)&gt;           &lt;ARIMA(0,1,1)&gt; &lt;COMBINATION&gt;
-2 New South Wales    &lt;ETS(A,N,A)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-3 Northern Territory &lt;ETS(M,N,M)&gt; &lt;ARIMA(1,0,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-4 Queensland         &lt;ETS(A,N,A)&gt;           &lt;ARIMA(2,1,2)&gt; &lt;COMBINATION&gt;
-5 South Australia    &lt;ETS(M,N,A)&gt; &lt;ARIMA(1,0,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-6 Tasmania           &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,0,3)(2,1,0)[4]&gt; &lt;COMBINATION&gt;
-7 Victoria           &lt;ETS(M,N,M)&gt; &lt;ARIMA(0,1,1)(0,1,1)[4]&gt; &lt;COMBINATION&gt;
-8 Western Australia  &lt;ETS(M,N,M)&gt;           &lt;ARIMA(0,1,3)&gt; &lt;COMBINATION&gt;</code></pre>
-</div>
-</div>
-<p>Each row of a mable corresponds to a separate time series (uniquely identified by its keys). From the output we can see a wide variety of models have been chosen. Some models have trend, others have seasonality, some have neither trend nor seasonality!</p>
-<p>Producing forecasts and evaluating accuracy is no different whether you’re modelling one time series or a hundred.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>fit <span class="sc">%&gt;%</span> </span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(tourism_state, <span class="at">level =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/state-fc-plot-1.png" class="img-fluid figure-img" width="816"></p>
-</figure>
-</div>
-</div>
-</div>
+<p>Visualising distributions with ggdist are not limited to forecasting, and by designing extensions to be more modular (and consequently, do less) they can be reused more widely.</p>
 </section>
 </section>
-<section id="extensibility-with-fabletools" class="level1">
-<h1>Extensibility with fabletools</h1>
-<p>Extensibility is at the core of fable. <em>fable</em> is actually built as an extension of the more general <a href="https://fabletools.tidyverts.org/"><em>fabletools</em> package</a>. This allows extension modelling package developers to focus on writing methods specific to their model. More general methods used in modelling and forecasting are provided automatically by <em>fabletools</em>.</p>
-<p>Depending on the chosen model, the following features are supported:</p>
-<ul>
-<li>Forecasting (<code>forecast()</code>)</li>
-<li>Missing value interpolation (<code>interpolate()</code>)</li>
-<li>Reporting model output (<code>report()</code>)</li>
-<li>Simulation of future paths (<code>generate()</code>)</li>
-<li>Streaming new data (<code>stream()</code>)</li>
-<li>Re-estimation (<code>refit()</code>)</li>
-<li>Decomposition of model components (<code>components()</code>)</li>
-<li>Model equation output (<code>equation()</code>)</li>
-<li>Broom verbs (<code>augment()</code>, <code>coef()</code>/<code>tidy()</code>, <code>glance()</code>)</li>
-<li>Model fits (<code>fitted()</code>, <code>residuals()</code>)</li>
-</ul>
-<p>General <em>fabletools</em> functionality for all models include:</p>
-<ul>
-<li>Seamless integration with existing packages in the tidyverse</li>
-<li>Tools for consistent modelling interface design (such as formula parsing)</li>
-<li>Response transformations and back-transformations with bias adjustment</li>
-<li>Batch modelling with parallelisation</li>
-<li>Forecast distributions and intervals</li>
-<li>Visualisation of time series, decompositions, and forecasts (<code>autoplot()</code>)</li>
-<li>Accuracy evaluation (<code>accuracy()</code>) with <a href="https://fabletools.tidyverts.org/reference/index.html#section-accuracy-evaluation">many accuracy measures</a></li>
-<li>Model combination (<code>combination_model()</code> / <code>(ets + arima)/2</code>)</li>
-<li>Decomposition modelling (<code>decomposition_model()</code>)</li>
-<li>Forecast reconciliation (<code>reconcile()</code>, <code>min_trace()</code>)</li>
-</ul>
-<p>Keep an eye out for more extension modelling packages being released this year!</p>
-</section>
-<section id="read-more-about-fable" class="level1">
-<h1>Read more about fable</h1>
-<p>While this blog post is long and covers a lot of things about forecasting with fable, it is far from comprehensive. Currently, the best resource for learning forecasting with fable is the <a href="https://otexts.com/fpp3/"><em>Forecasting: Principles and Practices (3ed.)</em></a> book, which is freely available online.</p>
-<p>Some other places with more information about <em>fable</em> include:</p>
-<ul>
-<li>The <a href="http://fable.tidyverts.org/">pkgdown website</a></li>
-<li>Rob Hyndman’s blog post: <a href="https://robjhyndman.com/hyndsight/fable/"><em>Tidy forecasting in R</em></a></li>
-<li>The <a href="http://fable.tidyverts.org/articles/fable.html"><em>Introduction to fable</em></a> vignette</li>
-<li>UseR!2019 talk: <a href="https://www.youtube.com/watch?v=DhDOTxojQ3k"><em>Flexible futures for fable functionality</em></a></li>
-<li>The <a href="https://github.com/tidyverts/fable/">GitHub repository</a></li>
-</ul>
-<!-- --- -->
-<!-- Tidy time series -->
-<!-- Recent time series challenges are characterised by the need to forecast many time series that are observed very frequently.    -->
-<!-- Using appropriate data structures is an essential first step in tackling these challenges. Many temporal data structures have been proposed in the past, each attempting to find a balance between efficiency and generality. On the two extremes of this spectrum are `ts` and `tsibble` (used by forecast and fable packages respectively).  -->
-<!-- The `ts` class provides the bare minimum, making it very efficient but extremely limited. It consists of a vector of numbers, and 3 numbers describing the start, end, and frequency of the data. As a result, it is limited to a single time series that is observed at regular intervals.  -->
-<!-- ts object -->
-<!-- A `tsibble` is a tibble for time series, which makes it very general at the expense of some overhead. Many time series are stored in a tidy format using key variables, and multiple measurements (of any class) can be stored as measured variables in the columns. The data must also contain an index, which describes the time for each observation. This flexibility makes it suitable for working with time series commonly collected today.  -->
-<!-- tsibble object -->
-<!-- Which is better? In almost every case `tsibble`. If you're working with a single regularly spaced time series, `ts` may be slightly faster but you lose access to many great packages designed around tidy data. The use of `ts` in the forecast package is a common source of confusion for new forecasters: creating a ts object, frequency, plot axis.  -->
-<!-- Tidy temporal data with tsibble forms the foundation of fable, allowing existing data analysis skills to be used within a time series forecasting workflow.  -->
-<!-- tsibble plot -->
-<!-- Forecasting with fable -->
-<!-- Modelling functions in fable use a formula based interface, which should be familiar to those  -->
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>While creating, learning and using grammar elements is harder than plot helper functions, they allow you to create more visually beautiful and analytically useful graphics. Good design of these grammar elements enables their reusability in making any style of plot for any purpose.</p>
+<p>Plot helpers can’t possibly create the perfect visualisation for your analysis - and they shouldn’t try to<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a>. Attempts to make helper functions do more make them harder to learn and use<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a>. To keep plot helper functions simple, I refuse to add extra options for changing the style of the plot even if it is easy to do so.</p>
+<!-- For more bespoke visualisation it is better to directly use ggplot2 and think more about the plot elements that best suit your needs. -->
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{o'hara-wild2019,
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>The few times I have implemented these requests I later realise I shouldn’t have.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>I take semantic/pedantic issue with calling functions which use ggplot2 ‘extensions’, and think this causes some design confusion among developers and users. Both function types appear in the ggplot2 <a href="https://exts.ggplot2.tidyverse.org/gallery/">official <em>‘extensions’</em> gallery</a>, and consequently it is common for all ggplot2-related packages to be called extensions.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>For more details I highly recommend this 20 minute presentation - <a href="https://www.youtube.com/watch?v=h5cTacaWE6I"><em>The Glamour of Graphics</em></a> by <a href="https://www.williamrchase.com/">William Chase</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>The <a href="https://ggplot2.tidyverse.org/articles/extending-ggplot2.html"><em>Extending ggplot2</em></a> vignette is a good place to start learning the ggproto extension system.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Further than that, <code>geom_bar()</code> is a special case of <code>geom_rect()</code>.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>This is also why we don’t have a <code>geom_piechart()</code>, since it would involve both a bar geometry and polar coordinate elements.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p><code>autoplot()</code> is a ggplot2 function for creating plot helpers for a specific object class.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>As mentioned earlier with <code>geom_histogram()</code> I think more separation between geometry and statistic is a better design than what I previously created with <code>geom_forecast()</code>.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>The tidy/rectangular successor to the forecast package.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>I’m pleased to see others take on this belief in these great Stack Overflow answers: <a href="https://stackoverflow.com/questions/78512507/stop-fabletools-autoplot-from-using-color-aesthetic-for-models-when-faceting" class="uri">https://stackoverflow.com/questions/78512507/stop-fabletools-autoplot-from-using-color-aesthetic-for-models-when-faceting</a><a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>This is especially evident in Cynthia Huang’s comparison of <a href="https://www.cynthiahqy.com/posts/ggplot-wrapper-design/#same-same-but-very-different-variation-in-helper-interfaces">three calendar plot helper variants</a><a href="#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{o'hara-wild2024,
   author = {O’Hara-Wild, Mitchell},
-  title = {Extension and Wrapper Packages of Ggplot2},
-  date = {2019-09-30},
-  url = {https://mitchelloharawild.github.io/mitchelloharawild.com//blog/ggplot2-packages},
+  title = {Why {I} Refuse to Add Style Options to My Ggplot2 Plot
+    Functions},
+  date = {2024-05-25},
+  url = {https://mitchelloharawild.com//blog/ggplot2-packages},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2019" class="csl-entry quarto-appendix-citeas" role="listitem">
-O’Hara-Wild, Mitchell. 2019. <span>“Extension and Wrapper Packages of
-Ggplot2.”</span> September 30, 2019. <a href="https://mitchelloharawild.github.io/mitchelloharawild.com//blog/ggplot2-packages">https://mitchelloharawild.github.io/mitchelloharawild.com//blog/ggplot2-packages</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2024" class="csl-entry quarto-appendix-citeas" role="listitem">
+O’Hara-Wild, Mitchell. 2024. <span>“Why I Refuse to Add Style Options to
+My Ggplot2 Plot Functions.”</span> May 25, 2024. <a href="https://mitchelloharawild.com//blog/ggplot2-packages">https://mitchelloharawild.com//blog/ggplot2-packages</a>.
 </div></div></section></div></main> <!-- /main -->
 <!-- plausible --> 
 <script defer="" data-domain="mitchelloharawild.com" src="https://track.mitchelloharawild.com/js/plausible.js"></script>
@@ -760,7 +686,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/mitchelloharawild\.github\.io\/mitchelloharawild\.com\/");
+      var filterRegex = new RegExp("https:\/\/mitchelloharawild\.com\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

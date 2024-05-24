@@ -1,1 +1,1 @@
-Sitemap: https://mitchelloharawild.github.io/mitchelloharawild.com/sitemap.xml
+Sitemap: https://mitchelloharawild.com/sitemap.xml

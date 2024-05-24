@@ -2,8 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
-      "/blog/fable-transformations/index.html",
-      "/blog/ggplot2-packages/index.html",
+      "/blog/ggplot2-package-design/index.html",
       "/blog/fable/index.html",
       "/blog/feasts/index.html",
       "/blog/vitae-0-2-0/index.html",

@@ -19,7 +19,7 @@ comments:
     theme: light
     repo: mitchelloharawild/mitchelloharawild.com
     repo-id: R_kgDOL1lyyA
-    category: Blog
+    category: giscus
     category-id: DIC_kwDOL1lyyM4CfEDn
     mapping: pathname
     reactions-enabled: true

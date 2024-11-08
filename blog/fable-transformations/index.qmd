@@ -1,0 +1,22 @@
+---
+title: Transformations in fable
+description: 'Simplifying data for modelling with transformations'
+date: today
+categories:
+  - time series
+  - forecasting
+tags:
+  - cran
+  - package
+  - time series
+image: 'fable-opengraph.png'
+image-alt: 'fable: tidy time series forecasting'
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.width = 8.5)
+```
+
+`r htmltools::img(src = "fable.png", class = "hex")`
+
+* How apply different transformations across multiple time series

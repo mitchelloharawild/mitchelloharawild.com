@@ -18,7 +18,7 @@ about:
       href: https://scholar.google.com/citations?user=NVlC6vMAAAAJ
     - icon: file-earmark-person
       text: CV
-      href: http://www.github.com/mitchelloharawild/CV
+      href: https://raw.githubusercontent.com/mitchelloharawild/CV/main/CV.pdf
     - icon: envelope
       text: Email
       href: mailto:mail@mitchelloharawild.com

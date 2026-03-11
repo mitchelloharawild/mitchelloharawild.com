@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mitchelloharawild.com/index.html</loc>
-    <lastmod>2024-05-01T10:02:31.314Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog/taipan/index.html</loc>
-    <lastmod>2024-05-01T09:59:33.222Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog/fable/index.html</loc>
-    <lastmod>2024-05-01T09:58:14.353Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog/feasts/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.897Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog/user-2018-feature-wall/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.981Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog/ggplot2-package-design/index.html</loc>
-    <lastmod>2024-05-25T06:40:07.097Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog.html</loc>
-    <lastmod>2024-05-24T14:40:17.347Z</lastmod>
-  </url>
-  <url>
     <loc>https://mitchelloharawild.com/about.html</loc>
-    <lastmod>2024-05-01T08:15:44.893Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mitchelloharawild.com/blog/vitae/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.981Z</lastmod>
+    <lastmod>2025-11-27T12:38:16.685Z</lastmod>
   </url>
   <url>
     <loc>https://mitchelloharawild.com/blog/tsibbledata/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.929Z</lastmod>
+    <lastmod>2025-11-27T12:38:16.714Z</lastmod>
   </url>
   <url>
-    <loc>https://mitchelloharawild.com/blog/loading-r-packages-in-a-loop/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.925Z</lastmod>
+    <loc>https://mitchelloharawild.com/blog/feasts/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.688Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog/fable/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.687Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog/user-2018-feature-wall/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.750Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog/ggplot2-package-design/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.688Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog.html</loc>
+    <lastmod>2025-11-27T12:38:16.685Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog/vitae/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.751Z</lastmod>
   </url>
   <url>
     <loc>https://mitchelloharawild.com/blog/vitae-0-2-0/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.981Z</lastmod>
+    <lastmod>2025-11-27T12:38:16.750Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog/loading-r-packages-in-a-loop/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.709Z</lastmod>
   </url>
   <url>
     <loc>https://mitchelloharawild.com/blog/hexwall/index.html</loc>
-    <lastmod>2024-05-01T08:15:44.921Z</lastmod>
+    <lastmod>2025-11-27T12:38:16.708Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/blog/taipan/index.html</loc>
+    <lastmod>2025-11-27T12:38:16.710Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mitchelloharawild.com/index.html</loc>
+    <lastmod>2026-03-11T08:21:32.580Z</lastmod>
   </url>
 </urlset>

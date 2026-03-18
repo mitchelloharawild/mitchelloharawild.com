@@ -1,0 +1,84 @@
+---
+title: Dynamic DNS on an EdgeRouter ER‑X with Cloudflare
+description: |
+  This post walks through using a Ubiquiti EdgeRouter ER‑X to update Cloudflare DNS records whenever your home IP changes. It features a small bash script which uses the Cloudflare API to update records whenever the router's WAN IP changes.
+date: '2026-03-18'
+filters:
+  - include-code-files
+categories:
+  - networking
+tags:
+  - dns
+  - cloudflare
+  - ubiquiti
+image: 'opengraph.png'
+image-alt: 'Dynamic DNS with Cloudflare'
+---
+
+To make my self-hosted services more reliable while I'm travelling, I've migrated some critical services to run directly on my router. By offloading these tasks from my server, I remove a point of failure (server outages) from affecting the network. I use a Ubiquiti EdgeRouter X (ER-X) at home, and was inspired to make this change by [Wesley Brewer's post](https://dev.to/zer0ed/install-adguard-home-on-edgerouter-x-including-local-hostname-resoluion-using-dnsmasq-2hmc) about running [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome/) directly on the router. In addition to running AdGuard Home on the router, I also moved my dynamic DNS service from [Home Assistant](https://github.com/home-assistant/core)'s [Cloudflare integration](https://www.home-assistant.io/integrations/cloudflare) to a short bash script. Running these services directly on the router ensures that my network is internet accessible, even if my server goes down - unless of course the router also goes down, but then I wouldn't have internet anyway!
+
+## The Cloudflare API
+
+The script uses the [Cloudflare v4 API](https://developers.cloudflare.com/api/), specifically the `PUT` endpoint for updating an existing DNS record:
+
+```
+https://api.cloudflare.com/client/v4/zones/<zone_id>/dns_records/<record_id>
+```
+
+To authenticate with this endpoint you'll need a Cloudflare API token. For dynamic DNS you need a token with `Zone:Zone:Read` and `Zone:DNS:Edit` permissions. Cloudflare's documentation covers the full token creation process at [developers.cloudflare.com/fundamentals/api/get-started/create-token/](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/).
+
+For each DNS record you want to update, you'll also need a "Zone ID" and "Record ID". First find the zone ID on the Overview page for your domain (right-hand sidebar under API). The record ID can be retrieved via the API (it's not shown in the dashboard). In the terminal, use this curl command (replacing `<your_zone_id>` and `<your_api_token>`) to list all of the records (and their IDs) for that zone.
+
+```bash
+curl -s -X GET \
+  "https://api.cloudflare.com/client/v4/zones/<your_zone_id>/dns_records" \
+  -H "Authorization: Bearer <your_api_token>" \
+  -H "Content-Type: application/json"
+```
+
+With the API token, Zone ID(s), and Record ID(s) in hand, we can use the Cloudflare API to update DNS records.
+
+```bash
+curl -s -X PUT \
+  "https://api.cloudflare.com/client/v4/zones/<your_zone_id>/dns_records/<your_record_id>" \
+  -H "Authorization: Bearer <your_api_token>" \
+  -H "Content-Type: application/json" \
+  --data "<json_formatted_record_data>"
+```
+
+The script below uses this API to automatically update DNS records via the Cloudflare API whenever the router's public IP changes.
+
+
+## Dynamic DNS records
+
+The script works in three steps:
+
+1. Get the current public IP
+   
+   The IP is read directly from the router's WAN interface using `ip addr` rather than querying an third-party IP-echo service (for both speed and reliability).
+2. Compare IP against the cached IP
+   
+   The current public IP is compared with the last IP that this script updated Cloudflare with. Storing the previous IP in a local cache file removes the need for API calls or DNS requests.
+3. Update Cloudflare IP
+   
+   If the IP has changed, the script uses the above `PUT` request to the Cloudflare API to update the outdated DNS records. The last IP local cache is only written once the API reports a success, so if the request fails it will be retried when the script is next run.
+
+``` {.markdown include="update-cloudflare-ddns.sh" filename="/config/scripts/update-cloudflare-ddns.sh [59 lines]"}
+```
+
+To use this script, replace `<your_api_token>` with your API token and enter the records to keep updated in the RECORDS array. This script allows multiple records across several zones to be updated, simply add an entry for each record into the RECORDS array. Finally, we'll also need to make this script executable.
+
+```bash
+chmod +x /config/scripts/update-cloudflare-ddns.sh
+```
+
+The task scheduler on the ER-X can be used to regularly run this script - I've set the script to run every couple minutes. Since the IP rarely changes, the vast majority of runs will quickly hit the cache check and exit immediately (requiring no API calls, no network traffic). 
+
+```bash
+configure
+set system task-scheduler task cloudflare-ddns executable path /config/scripts/update-cloudflare-ddns.sh
+set system task-scheduler task cloudflare-ddns interval 2m
+commit
+save
+exit
+```

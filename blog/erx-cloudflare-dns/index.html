@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mitchell O’Hara-Wild">
-<meta name="dcterms.date" content="2018-07-11">
-<meta name="description" content="Creating the hexmap feature wall for useR! 2018">
+<meta name="dcterms.date" content="2026-03-18">
+<meta name="description" content="This post walks through using a Ubiquiti EdgeRouter ER‑X to update Cloudflare DNS records whenever your home IP changes. It features a small bash script which uses the Cloudflare API to update records whenever the router’s WAN IP changes.">
 
-<title>useR! 2018 feature wall – Mitchell O’Hara-Wild</title>
+<title>Dynamic DNS on an EdgeRouter ER‑X with Cloudflare – Mitchell O’Hara-Wild</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -147,15 +147,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">useR! 2018 feature wall</h1>
+      <h1 class="title">Dynamic DNS on an EdgeRouter ER‑X with Cloudflare</h1>
                   <div>
         <div class="description">
-          Creating the hexmap feature wall for useR! 2018
+          <p>This post walks through using a Ubiquiti EdgeRouter ER‑X to update Cloudflare DNS records whenever your home IP changes. It features a small bash script which uses the Cloudflare API to update records whenever the router’s WAN IP changes.</p>
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">magick</div>
-                <div class="quarto-category">useR!2018</div>
+                <div class="quarto-category">networking</div>
               </div>
                   </div>
   </div>
@@ -173,14 +172,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">July 11, 2018</p>
+        <p class="date">March 18, 2026</p>
       </div>
     </div>
     
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">November 27, 2025</p>
+        <p class="date-modified">March 18, 2026</p>
       </div>
     </div>
       
@@ -195,9 +194,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#collection" id="toc-collection" class="nav-link active" data-scroll-target="#collection">Collection</a></li>
-  <li><a href="#hexwall" id="toc-hexwall" class="nav-link" data-scroll-target="#hexwall">hexwall</a></li>
-  <li><a href="#creating-the-hex-map" id="toc-creating-the-hex-map" class="nav-link" data-scroll-target="#creating-the-hex-map">Creating the hex map</a></li>
+  <li><a href="#the-cloudflare-api" id="toc-the-cloudflare-api" class="nav-link active" data-scroll-target="#the-cloudflare-api">The Cloudflare API</a></li>
+  <li><a href="#dynamic-dns-records" id="toc-dynamic-dns-records" class="nav-link" data-scroll-target="#dynamic-dns-records">Dynamic DNS records</a></li>
   </ul>
 </nav>
     </div>
@@ -208,124 +206,123 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>The hexwall at <a href="http://user2018.r-project.org/">useR! 2018</a> features roughly 200 contributed R package hexagon stickers. If you’ve ever had difficulty aligning hexagon stickers in your slides or even on your laptop, you may appreciate the challenge of arranging hundreds of hexagons. Fortunately with R and a little bit of magick, we can substantially simplify this process.</p>
-<section id="collection" class="level2">
-<h2 class="anchored" data-anchor-id="collection">Collection</h2>
-<p>Hexagon collection proved to be one of the more time-consuming steps in the project. Without a Comprehensive R Hexagon Repository (CRHR), Di Cook (<a href="https://twitter.com/visnut/">@visnut</a>) and I resorted to collecting hexagons via email and promoting the project via twitter.</p>
-<p></p><div id="tweet-58473"></div><script>tweet={"url":"https:\/\/twitter.com\/useR2018_conf\/status\/999443177412030464","author_name":"useR!2018","author_url":"https:\/\/twitter.com\/useR2018_conf","html":"\u003Cblockquote class=\"twitter-tweet\" align=\"center\"\u003E\u003Cp lang=\"en\" dir=\"ltr\"\u003EAre you interested in having your package included in our feature wall? Send the image of your package hex sticker to buseco-user2018@monash.edu We will make a big banner from the hex images provided for useR! 2018! \u003Ca href=\"https:\/\/twitter.com\/hashtag\/rstats?src=hash&amp;ref_src=twsrc%5Etfw\"\u003E#rstats\u003C\/a\u003E\u003C\/p\u003E&mdash; useR!2018 (@useR2018_conf) \u003Ca href=\"https:\/\/twitter.com\/useR2018_conf\/status\/999443177412030464?ref_src=twsrc%5Etfw\"\u003EMay 24, 2018\u003C\/a\u003E\u003C\/blockquote\u003E\n\u003Cscript async src=\"https:\/\/platform.twitter.com\/widgets.js\" charset=\"utf-8\"\u003E\u003C\/script\u003E\n\n","width":550,"height":null,"type":"rich","cache_age":"3153600000","provider_name":"Twitter","provider_url":"https:\/\/twitter.com","version":"1.0"};document.getElementById("tweet-58473").innerHTML = tweet["html"];</script><p></p>
-<p>Our collection efforts were also supported by Rstudio’s <a href="http://github.com/rstudio/hex-stickers">hex-stickers</a> and Bioconductor’s <a href="https://github.com/Bioconductor/BiocStickers">BiocStickers</a> repositories. We opted not to sift through the <a href="http://hexb.in/">hexb.in</a> library as we wanted the feature wall to feature only R package stickers.</p>
-<p>The response to our project has been huge, and we are grateful for everyone who has contributed their stickers.</p>
+<p>To make my self-hosted services more reliable while I’m travelling, I’ve migrated some critical services to run directly on my router. By offloading these tasks from my server, I remove a point of failure (server outages) from affecting the network. I use a Ubiquiti EdgeRouter X (ER-X) at home, and was inspired to make this change by <a href="https://dev.to/zer0ed/install-adguard-home-on-edgerouter-x-including-local-hostname-resoluion-using-dnsmasq-2hmc">Wesley Brewer’s post</a> about running <a href="https://github.com/AdguardTeam/AdGuardHome/">AdGuard Home</a> directly on the router. In addition to running AdGuard Home on the router, I also moved my dynamic DNS service from <a href="https://github.com/home-assistant/core">Home Assistant</a>’s <a href="https://www.home-assistant.io/integrations/cloudflare">Cloudflare integration</a> to a short bash script. Running these services directly on the router ensures that my network is internet accessible, even if my server goes down - unless of course the router also goes down, but then I wouldn’t have internet anyway!</p>
+<section id="the-cloudflare-api" class="level2">
+<h2 class="anchored" data-anchor-id="the-cloudflare-api">The Cloudflare API</h2>
+<p>The script uses the <a href="https://developers.cloudflare.com/api/">Cloudflare v4 API</a>, specifically the <code>PUT</code> endpoint for updating an existing DNS record:</p>
+<pre><code>https://api.cloudflare.com/client/v4/zones/&lt;zone_id&gt;/dns_records/&lt;record_id&gt;</code></pre>
+<p>To authenticate with this endpoint you’ll need a Cloudflare API token. For dynamic DNS you need a token with <code>Zone:Zone:Read</code> and <code>Zone:DNS:Edit</code> permissions. Cloudflare’s documentation covers the full token creation process at <a href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/">developers.cloudflare.com/fundamentals/api/get-started/create-token/</a>.</p>
+<p>For each DNS record you want to update, you’ll also need a “Zone ID” and “Record ID”. First find the zone ID on the Overview page for your domain (right-hand sidebar under API). The record ID can be retrieved via the API (it’s not shown in the dashboard). In the terminal, use this curl command (replacing <code>&lt;your_zone_id&gt;</code> and <code>&lt;your_api_token&gt;</code>) to list all of the records (and their IDs) for that zone.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-X</span> GET <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://api.cloudflare.com/client/v4/zones/&lt;your_zone_id&gt;/dns_records"</span> <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Authorization: Bearer &lt;your_api_token&gt;"</span> <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Content-Type: application/json"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>With the API token, Zone ID(s), and Record ID(s) in hand, we can use the Cloudflare API to update DNS records.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-X</span> PUT <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://api.cloudflare.com/client/v4/zones/&lt;your_zone_id&gt;/dns_records/&lt;your_record_id&gt;"</span> <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Authorization: Bearer &lt;your_api_token&gt;"</span> <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Content-Type: application/json"</span> <span class="dt">\</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--data</span> <span class="st">"&lt;json_formatted_record_data&gt;"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The script below uses this API to automatically update DNS records via the Cloudflare API whenever the router’s public IP changes.</p>
 </section>
-<section id="hexwall" class="level2">
-<h2 class="anchored" data-anchor-id="hexwall">hexwall</h2>
-<p>The hexwall script (available at <a href="https://github.com/mitchelloharawild/hexwall">mitchelloharawild/hexwall</a>) provides the magick for cleaning, sorting, and arranging hexagons. The function does the following operations using the <a href="https://github.com/ropensci/magick">ROpenSci magick package</a>:</p>
-<ul>
-<li>Load the images</li>
-<li>Make white backgrounds transparent</li>
-<li>Trim images</li>
-<li>Remove bad images (low resolution or incorrect dimensions)</li>
-<li>Arrange the stickers on the canvas</li>
-</ul>
-<p>For more details on using magick to arrange hexagons, you can read <a href="https://blog.mitchelloharawild.com/blog/hexwall">arranging hex stickers in R</a></p>
-</section>
-<section id="creating-the-hex-map" class="level2">
-<h2 class="anchored" data-anchor-id="creating-the-hex-map">Creating the hex map</h2>
-<p>To create a hexagon map of Australia, we first need to find a map. I’m using the <a href="https://gadm.org/">GADM</a> database to give a nice boundary of Australia, which is easily obtainable via the raster package.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>aus <span class="ot">&lt;-</span> <span class="fu">getData</span>(<span class="st">"GADM"</span>, <span class="at">country =</span> <span class="st">"AUS"</span>, <span class="at">level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disaggregate</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geometry</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>#&gt; Warning in getData("GADM", country = "AUS", level = 0): getData will be removed in a future version of raster
-#&gt; . Please use the geodata package instead</code></pre>
+<section id="dynamic-dns-records" class="level2">
+<h2 class="anchored" data-anchor-id="dynamic-dns-records">Dynamic DNS records</h2>
+<p>The script works in three steps:</p>
+<ol type="1">
+<li><p>Get the current public IP</p>
+<p>The IP is read directly from the router’s WAN interface using <code>ip addr</code> rather than querying an third-party IP-echo service (for both speed and reliability).</p></li>
+<li><p>Compare IP against the cached IP</p>
+<p>The current public IP is compared with the last IP that this script updated Cloudflare with. Storing the previous IP in a local cache file removes the need for API calls or DNS requests.</p></li>
+<li><p>Update Cloudflare IP</p>
+<p>If the IP has changed, the script uses the above <code>PUT</code> request to the Cloudflare API to update the outdated DNS records. The last IP local cache is only written once the API reports a success, so if the request fails it will be retried when the script is next run.</p></li>
+</ol>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>/config/scripts/update-cloudflare-ddns.sh [59 lines]</strong></pre>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>#&gt; Warning in explodePolygons(x, ...): No rgeos support in sp from October 2023;
-#&gt; see https://r-spatial.org/r/2023/05/15/evolution4.html</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="/config/scripts/update-cloudflare-ddns.sh [59 lines]"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>#!/bin/vbash</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>source /opt/vyatta/etc/functions/script-template</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu"># --- USER CONFIG ---</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>CF_API_TOKEN="<span class="dt">&lt;</span><span class="kw">your_api_token</span><span class="dt">&gt;</span>"</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>WAN_IF="eth0"                      # WAN interface with your public IPv4</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>CF_TTL=120                         # TTL in seconds</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>CACHE_FILE="/config/scripts/cloudflare-ddns-ip.cache"</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu"># One entry per record:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu"># "ZONE_ID,RECORD_ID,NAME,TYPE,PROXIED"</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu"># TYPE is usually A (IPv4) or AAAA (IPv6)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu"># PROXIED is true or false</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>RECORDS=(</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  "<span class="dt">&lt;</span><span class="kw">your_zone_id</span><span class="dt">&gt;</span>,<span class="dt">&lt;</span><span class="kw">your_record_id</span><span class="dt">&gt;</span>,<span class="dt">&lt;</span><span class="kw">your_record_name</span><span class="dt">&gt;</span>,A,false"</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu"># -------------------</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu"># Get current IPv4 from WAN interface</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>current_ip=$(ip -4 addr show "$WAN_IF" | awk '/inet / {print $2}' | cut -d/ -f1)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot"> -z "$current_ip" </span><span class="co">]</span> &amp;&amp; exit 0</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># Compare with cached value</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>if <span class="co">[</span><span class="ot"> -f "$CACHE_FILE" </span><span class="co">]</span>; then</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    cached_ip=$(cat "$CACHE_FILE")</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>else</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    cached_ip=""</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>fi</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu"># If unchanged, nothing to do</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>if <span class="co">[</span><span class="ot"> "$current_ip" = "$cached_ip" </span><span class="co">]</span>; then</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    exit 0</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>fi</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="fu"># Update all records</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>all_ok=1</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>for rec in "${RECORDS<span class="co">[</span><span class="ot">@</span><span class="co">]</span>}"; do</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    IFS=',' read -r zone_id rec_id rec_name rec_type rec_proxied &lt;&lt;&lt; "$rec"</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="in">    # Only handle IPv4 A records here</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="in">    if [[ "$rec_type" != "A" ]]; then</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="in">        continue</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="in">    fi</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="in">    update_response=$(curl -s -X PUT \</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="in">      "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records/$rec_id" \</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="in">      -H "Authorization: Bearer $CF_API_TOKEN" \</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="in">      -H "Content-Type: application/json" \</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="in">      --data "{\"type\":\"$rec_type\",\"name\":\"$rec_name\",\"content\":\"$current_ip\",\"ttl\":$CF_TTL,\"proxied\":$rec_proxied}")</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="in">    if ! echo "$update_response" | grep -q '"success":true'; then</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="in">        all_ok=0</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="in">    fi</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>done</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="fu"># Only write cache if all updates succeeded</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>if <span class="co">[</span><span class="ot"> "$all_ok" -eq 1 </span><span class="co">]</span>; then</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    echo "$current_ip" &gt; "$CACHE_FILE"</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>fi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_as_sf</span>(aus))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/getAus-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>To convert this map into hexagonal coordinates, we can use the <code>spsample</code> function to sample a hexagonal lattice. Through experimentation, a cellsize of 2 is roughly appropriate for the number of hexagons submitted to us. As it is a random process, some repetition may be needed to get the exact number of hexagons on the map with a nice layout.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hex_points <span class="ot">&lt;-</span> aus <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spsample</span>(<span class="at">type =</span> <span class="st">"hexagonal"</span>, <span class="at">cellsize =</span> <span class="dv">2</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(hex_points<span class="sc">@</span>coords)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>#&gt; # A tibble: 201 x 2
-#&gt;        x     y
-#&gt;    &lt;dbl&gt; &lt;dbl&gt;
-#&gt;  1  146. -43.3
-#&gt;  2  145. -41.6
-#&gt;  3  147. -41.6
-#&gt;  4  141. -38.1
-#&gt;  5  143. -38.1
-#&gt;  6  145. -38.1
-#&gt;  7  147. -38.1
-#&gt;  8  140. -36.4
-#&gt;  9  142. -36.4
-#&gt; 10  144. -36.4
-#&gt; # i 191 more rows</code></pre>
-</div>
-</div>
-<p>To ensure that we are happy with the hexagon placements, we should view the hexagon grid on a map. We can convert our coordinates to hexagonal polygons using <code>HexPoints2SpatialPolygons</code>, and then plot them on the map.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>aus_hex <span class="ot">&lt;-</span> <span class="fu">HexPoints2SpatialPolygons</span>(hex_points, <span class="at">dx =</span> <span class="dv">2</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_as_sf</span>(aus)) <span class="sc">+</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_as_sf</span>(aus_hex), <span class="at">colour =</span> <span class="st">"blue"</span>, <span class="at">fill =</span> <span class="cn">NA</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/plotHex-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Looks great, let’s make the map. Using the script from <a href="https://github.com/mitchelloharawild/hexwall">mitchelloharawild/hexwall</a>, we provide:</p>
-<ul>
-<li>A folder containing the hexagon images</li>
-<li>Desired pixel width of each hexagon</li>
-<li>Hexagon coordinates computed above</li>
-</ul>
-<p>If there are lot of stickers to position, or the resulting image dimension is large, this may take some time.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"hexwall.R"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hexwall</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"hexstickers"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sticker_width =</span> <span class="dv">500</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">coords =</span> hex_points<span class="sc">@</span>coords,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_mode =</span> <span class="st">"colour"</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><img src="final.jpg" class="img-fluid"></p>
-<p>Beyond that, there were just a few finishing touches needed to add the useR! 2018 logo and text. Hope you all enjoy the 2018 useR! conference :)</p>
+<p>To use this script, replace <code>&lt;your_api_token&gt;</code> with your API token and enter the records to keep updated in the RECORDS array. This script allows multiple records across several zones to be updated, simply add an entry for each record into the RECORDS array. Finally, we’ll also need to make this script executable.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x /config/scripts/update-cloudflare-ddns.sh</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The task scheduler on the ER-X can be used to regularly run this script - I’ve set the script to run every couple minutes. Since the IP rarely changes, the vast majority of runs will quickly hit the cache check and exit immediately (requiring no API calls, no network traffic).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">configure</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> system task-scheduler task cloudflare-ddns executable path /config/scripts/update-cloudflare-ddns.sh</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> system task-scheduler task cloudflare-ddns interval 2m</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">commit</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">save</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{o'hara-wild2018,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{o'hara-wild2026,
   author = {O’Hara-Wild, Mitchell},
-  title = {useR! 2018 Feature Wall},
-  date = {2018-07-11},
-  url = {https://mitchelloharawild.com/blog/user-2018-feature-wall/},
+  title = {Dynamic {DNS} on an {EdgeRouter} {ER‑X} with {Cloudflare}},
+  date = {2026-03-18},
+  url = {https://mitchelloharawild.com/blog/erx-cloudflare-dns/},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2018" class="csl-entry quarto-appendix-citeas" role="listitem">
-O’Hara-Wild, Mitchell. 2018. <span>“useR! 2018 Feature Wall.”</span>
-July 11, 2018. <a href="https://mitchelloharawild.com/blog/user-2018-feature-wall/">https://mitchelloharawild.com/blog/user-2018-feature-wall/</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-o'hara-wild2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+O’Hara-Wild, Mitchell. 2026. <span>“Dynamic DNS on an EdgeRouter ER‑X
+with Cloudflare.”</span> March 18, 2026. <a href="https://mitchelloharawild.com/blog/erx-cloudflare-dns/">https://mitchelloharawild.com/blog/erx-cloudflare-dns/</a>.
 </div></div></section></div></main> <!-- /main -->
 <!-- plausible --> 
 <!-- Privacy-friendly analytics by Plausible -->
@@ -768,5 +765,4 @@ July 11, 2018. <a href="https://mitchelloharawild.com/blog/user-2018-feature-wal
 
 
 
-<script src="https://platform.twitter.com/widgets.js"></script>
 </body></html>

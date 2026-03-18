@@ -3,6 +3,7 @@
     "listing": "/blog.html",
     "items": [
       "/blog/ggplot2-package-design/index.html",
+      "/blog/erx-cloudflare-dns/index.html",
       "/blog/fable/index.html",
       "/blog/feasts/index.html",
       "/blog/vitae-0-2-0/index.html",

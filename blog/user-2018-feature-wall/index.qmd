@@ -14,6 +14,8 @@ tags:
 image: 'featurewall.png'
 image-alt: 'Hex sticker feature wall'
 freeze: true
+citation:
+  id: oharawild2018userhex
 ---
 ```{r, include=FALSE}
 knitr::opts_chunk$set(

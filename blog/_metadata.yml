@@ -1,4 +1,8 @@
-author: "Mitchell O'Hara-Wild"
+author: 
+  - name:
+      given: Mitchell
+      family: O'Hara-Wild
+    orcid: 0000-0001-6729-7695
 image: featured.jpg
 card-style: "summary"
 date-modified: last-modified

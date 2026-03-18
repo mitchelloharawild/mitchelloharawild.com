@@ -1,7 +1,7 @@
 ---
 title: Why I don't add style options to my ggplot2 functions
 description: 'Plot helper and grammar extension functions for ggplot2, and how good design helps you make better plots.'
-date: today
+date: '2024-05-25'
 categories:
   - ggplot2
   - packages
@@ -12,6 +12,8 @@ tags:
 execute:
   cache: true
 image-alt: 'Drawing of a package'
+citation:
+  id: oharawild2024ggplotdesign
 ---
 
 ```{r setup, include = FALSE}

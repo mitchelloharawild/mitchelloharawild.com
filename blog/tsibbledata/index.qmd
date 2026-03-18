@@ -13,6 +13,8 @@ tags:
   - time series
 image: 'tsibbledata-opengraph.png'
 image-alt: 'tsibbledata: diverse datasets for tsibble'
+citation:
+  id: oharawild2019tsibbledata
 ---
 
 ```{r, include=FALSE}

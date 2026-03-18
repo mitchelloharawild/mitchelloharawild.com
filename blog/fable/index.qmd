@@ -12,6 +12,8 @@ tags:
   - time series
 image: 'fable-opengraph.png'
 image-alt: 'fable: tidy time series forecasting'
+citation:
+  id: oharawild2019fable
 ---
 
 ```{r setup, include = FALSE}

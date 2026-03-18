@@ -13,6 +13,8 @@ tags:
 image: 'hexwall.png'
 image-alt: 'Example hexwall'
 freeze: true
+citation:
+  id: oharawild2018hexwall
 ---
 
 ```{r, include=FALSE}

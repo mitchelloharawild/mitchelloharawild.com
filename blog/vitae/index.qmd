@@ -11,6 +11,8 @@ tags:
   - rmarkdown
 image: 'vitae-feature.png'
 image-alt: 'Example vitae CV'
+citation:
+  id: oharawild2019vitae
 ---
 
 `r htmltools::img(src = "vitae.png", class = "hex")` For those looking to refresh their CV this year, the [vitae package](https://ropenscilabs.github.io/vitae/) may offer a convenient and maintainable solution. The package leverages the power of [R Markdown's dynamic documents](https://rmarkdown.rstudio.com/) to help you create, maintain, and even automate your Résumé or CV. The package provides a growing collection of popular CV templates, with simple data-driven functions add entries such as your education, experiences, and accolades. As the CV entries can be generated from data, it integrates well with existing and future R packages. This allows you to programatically filter your CV experiences to be more relevant for each job, and automatically download your qualifications or work experience from the web.

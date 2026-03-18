@@ -12,6 +12,8 @@ tags:
   - rmarkdown
 image: 'latexcv.png'
 image-alt: 'New vitae latexcv template'
+citation:
+  id: oharawild2019vitae2
 ---
 
 `r htmltools::img(src = "vitae.png", class = "hex")`

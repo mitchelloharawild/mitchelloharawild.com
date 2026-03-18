@@ -13,6 +13,8 @@ tags:
   - shiny
 image: 'taipan_app.png'
 image-alt: 'Default taipan app'
+citation:
+  id: oharawild2018taipan
 ---
 
 ```{r, include=FALSE}

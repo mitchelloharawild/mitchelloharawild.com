@@ -11,6 +11,8 @@ tags:
   - loop
 feature: 'pkg_loop.png'
 feature_alt: 'Example NSE problem'
+citation:
+  id: oharawild2018rload
 ---
 ```{r, include=FALSE}
 knitr::opts_chunk$set(

@@ -50,36 +50,48 @@ The hexwall script (available at [mitchelloharawild/hexwall](https://github.com/
 For more details on using magick to arrange hexagons, you can read [arranging hex stickers in R](https://blog.mitchelloharawild.com/blog/hexwall)
 
 ## Creating the hex map
-To create a hexagon map of Australia, we first need to find a map. I'm using the [GADM](https://gadm.org/) database to give a nice boundary of Australia, which is easily obtainable via the raster package.
+To create a hexagon map of Australia, we first need to find a map. I'm using the [GADM](https://gadm.org/) database to give a nice boundary of Australia, which is easily obtainable via the [geodata package](https://github.com/rspatial/geodata) (the raster package's `getData()` used previously has since been removed in favour of geodata).
 
 ```{r getAus}
 library(tidyverse)
-library(raster)
 library(sf)
-aus <- getData("GADM", country = "AUS", level = 0) %>%
-  disaggregate() %>%
-  geometry()
+aus <- geodata::gadm(country = "AUS", level = 0, path = tempdir()) %>%
+  st_as_sf() %>%
+  st_cast("POLYGON") %>%
+  st_geometry() %>%
+  st_set_crs(NA)
 
-ggplot() + 
+# Keep only the mainland and Tasmania, dropping the many tiny offshore
+# islands so the hexagon tiling reflects Australia's overall shape
+aus <- aus[order(st_area(aus), decreasing = TRUE)[1:2]]
+
+ggplot() +
   geom_sf(data = st_as_sf(aus))
 ```
 
-To convert this map into hexagonal coordinates, we can use the `spsample` function to sample a hexagonal lattice. Through experimentation, a cellsize of 2 is roughly appropriate for the number of hexagons submitted to us. As it is a random process, some repetition may be needed to get the exact number of hexagons on the map with a nice layout.
+To convert this map into hexagonal coordinates, we can use `sf::st_make_grid()` to lay a hexagonal lattice over the map, keeping only the hexagons that overlap Australia's outline. Through experimentation, a cellsize of 2 is roughly appropriate for the number of hexagons submitted to us. As it is a random process, some repetition may be needed to get the exact number of hexagons on the map with a nice layout.
+
+The mainland and Tasmania are gridded separately, testing overlap against a slightly eroded outline (`st_buffer(land, -0.3)`). This trims the hexagons that would otherwise only just clip the coastline, so the tiling doesn't bridge the Bass Strait gap between the two.
 
 ```{r getCoords}
-hex_points <- aus %>%
-  spsample(type = "hexagonal", cellsize = 2)
+hex_grid <- aus %>%
+  map(function(land) {
+    grid <- st_make_grid(land, cellsize = 2, square = FALSE)
+    grid[st_intersects(grid, st_buffer(land, -0.3), sparse = FALSE)]
+  }) %>%
+  reduce(c)
 
-as_tibble(hex_points@coords)
+hex_points <- st_centroid(hex_grid)
+as_tibble(st_coordinates(hex_points))
 ```
 
-To ensure that we are happy with the hexagon placements, we should view the hexagon grid on a map. We can convert our coordinates to hexagonal polygons using `HexPoints2SpatialPolygons`, and then plot them on the map.
+To ensure that we are happy with the hexagon placements, we should view the hexagon grid on a map.
 
 ```{r plotHex}
-aus_hex <- HexPoints2SpatialPolygons(hex_points, dx = 2)
+aus_hex <- hex_grid
 
-ggplot() + 
-  geom_sf(data = st_as_sf(aus)) + 
+ggplot() +
+  geom_sf(data = st_as_sf(aus)) +
   geom_sf(data = st_as_sf(aus_hex), colour = "blue", fill = NA)
 ```
 
@@ -96,7 +108,7 @@ source("hexwall.R")
 hexwall(
   "hexstickers",
   sticker_width = 500,
-  coords = hex_points@coords,
+  coords = st_coordinates(hex_points),
   sort_mode = "colour"
 )
 ```

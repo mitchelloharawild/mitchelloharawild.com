@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mitchell O’Hara-Wild">
-<meta name="dcterms.date" content="2018-07-11">
-<meta name="description" content="Creating the hexmap feature wall for useR! 2018">
+<meta name="dcterms.date" content="2026-07-12">
+<meta name="description" content="My first R core contribution, fixing an absurd seq.int() bug that produces massive sequences instead of empty vectors.">
 
-<title>useR! 2018 feature wall – Mitchell O’Hara-Wild</title>
+<title>Bugfixing R at R Dev Day 2026 – Mitchell O’Hara-Wild</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -147,14 +147,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">useR! 2018 feature wall</h1>
+      <h1 class="title">Bugfixing R at R Dev Day 2026</h1>
                   <div>
         <div class="description">
-          Creating the hexmap feature wall for useR! 2018
+          <p>My first R core contribution, fixing an absurd <code>seq.int()</code> bug that produces massive sequences instead of empty vectors.</p>
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">magick</div>
+                <div class="quarto-category">r-devel</div>
                 <div class="quarto-category">useR!</div>
               </div>
                   </div>
@@ -173,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">July 11, 2018</p>
+        <p class="date">July 12, 2026</p>
       </div>
     </div>
     
@@ -195,9 +195,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#collection" id="toc-collection" class="nav-link active" data-scroll-target="#collection">Collection</a></li>
-  <li><a href="#hexwall" id="toc-hexwall" class="nav-link" data-scroll-target="#hexwall">hexwall</a></li>
-  <li><a href="#creating-the-hex-map" id="toc-creating-the-hex-map" class="nav-link" data-scroll-target="#creating-the-hex-map">Creating the hex map</a></li>
+  <li><a href="#r-dev-days" id="toc-r-dev-days" class="nav-link active" data-scroll-target="#r-dev-days">R Dev Days</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a></li>
+  <li><a href="#debugging" id="toc-debugging" class="nav-link" data-scroll-target="#debugging">Debugging</a></li>
+  <li><a href="#fixing-r" id="toc-fixing-r" class="nav-link" data-scroll-target="#fixing-r">Fixing R</a></li>
+  <li><a href="#the-mystery-length" id="toc-the-mystery-length" class="nav-link" data-scroll-target="#the-mystery-length">The mystery length</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up" class="nav-link" data-scroll-target="#wrapping-up">Wrapping up</a></li>
   </ul>
 </nav>
     </div>
@@ -208,131 +211,137 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>The hexwall at <a href="http://user2018.r-project.org/">useR! 2018</a> features roughly 200 contributed R package hexagon stickers. If you’ve ever had difficulty aligning hexagon stickers in your slides or even on your laptop, you may appreciate the challenge of arranging hundreds of hexagons. Fortunately with R and a little bit of magick, we can substantially simplify this process.</p>
-<section id="collection" class="level2">
-<h2 class="anchored" data-anchor-id="collection">Collection</h2>
-<p>Hexagon collection proved to be one of the more time-consuming steps in the project. Without a Comprehensive R Hexagon Repository (CRHR), Di Cook (<a href="https://twitter.com/visnut/">@visnut</a>) and I resorted to collecting hexagons via email and promoting the project via twitter.</p>
-<p></p><div id="tweet-13851"></div><script>tweet={"url":"https:\/\/x.com\/useR2018_conf\/status\/999443177412030464","author_name":"useR!2018","author_url":"https:\/\/x.com\/useR2018_conf","html":"\u003Cblockquote class=\"twitter-tweet\" align=\"center\"\u003E\u003Cp lang=\"en\" dir=\"ltr\"\u003EAre you interested in having your package included in our feature wall? Send the image of your package hex sticker to buseco-user2018@monash.edu We will make a big banner from the hex images provided for useR! 2018! \u003Ca href=\"https:\/\/x.com\/hashtag\/rstats?src=hash&amp;ref_src=twsrc%5Etfw\"\u003E#rstats\u003C\/a\u003E\u003C\/p\u003E&mdash; useR!2018 (@useR2018_conf) \u003Ca href=\"https:\/\/x.com\/useR2018_conf\/status\/999443177412030464?ref_src=twsrc%5Etfw\"\u003EMay 24, 2018\u003C\/a\u003E\u003C\/blockquote\u003E\n\u003Cscript async src=\"https:\/\/platform.x.com\/widgets.js\" charset=\"utf-8\"\u003E\u003C\/script\u003E\n\n","width":550,"height":null,"type":"rich","cache_age":"3153600000","provider_name":"X","provider_url":"https:\/\/x.com","version":"1.0"};document.getElementById("tweet-13851").innerHTML = tweet["html"];</script><p></p>
-<p>Our collection efforts were also supported by Rstudio’s <a href="http://github.com/rstudio/hex-stickers">hex-stickers</a> and Bioconductor’s <a href="https://github.com/Bioconductor/BiocStickers">BiocStickers</a> repositories. We opted not to sift through the <a href="http://hexb.in/">hexb.in</a> library as we wanted the feature wall to feature only R package stickers.</p>
-<p>The response to our project has been huge, and we are grateful for everyone who has contributed their stickers.</p>
-</section>
-<section id="hexwall" class="level2">
-<h2 class="anchored" data-anchor-id="hexwall">hexwall</h2>
-<p>The hexwall script (available at <a href="https://github.com/mitchelloharawild/hexwall">mitchelloharawild/hexwall</a>) provides the magick for cleaning, sorting, and arranging hexagons. The function does the following operations using the <a href="https://github.com/ropensci/magick">ROpenSci magick package</a>:</p>
-<ul>
-<li>Load the images</li>
-<li>Make white backgrounds transparent</li>
-<li>Trim images</li>
-<li>Remove bad images (low resolution or incorrect dimensions)</li>
-<li>Arrange the stickers on the canvas</li>
-</ul>
-<p>For more details on using magick to arrange hexagons, you can read <a href="https://blog.mitchelloharawild.com/blog/hexwall">arranging hex stickers in R</a></p>
-</section>
-<section id="creating-the-hex-map" class="level2">
-<h2 class="anchored" data-anchor-id="creating-the-hex-map">Creating the hex map</h2>
-<p>To create a hexagon map of Australia, we first need to find a map. I’m using the <a href="https://gadm.org/">GADM</a> database to give a nice boundary of Australia, which is easily obtainable via the <a href="https://github.com/rspatial/geodata">geodata package</a> (the raster package’s <code>getData()</code> used previously has since been removed in favour of geodata).</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>aus <span class="ot">&lt;-</span> geodata<span class="sc">::</span><span class="fu">gadm</span>(<span class="at">country =</span> <span class="st">"AUS"</span>, <span class="at">level =</span> <span class="dv">0</span>, <span class="at">path =</span> <span class="fu">tempdir</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="st">"POLYGON"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_set_crs</span>(<span class="cn">NA</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>#&gt; Warning in st_cast.sf(., "POLYGON"): repeating attributes for all
-#&gt; sub-geometries for which they may not be constant</code></pre>
+<p>I recently made my first contribution to the R core language itself, fixing a bug I’d first encountered a few months ago while creating the <a href="https://pkg.mitchelloharawild.com/vecvec/">vecvec</a> R package. The absurdity of the bug caught my attention, and I immediately knew I wanted to investigate and fix it at the upcoming <a href="https://user2026.r-project.org/">useR! 2026</a> <a href="https://contributor.r-project.org/events/r-dev-days/">R Dev Day</a>.</p>
+<p>The bug: <code>seq.int(along.with = NULL)</code> returns a <em>massive</em> sequence, even though <code>length(NULL)</code> is 0. On my Linux installation it produces a sequence of more than <strong>100 trillion</strong> elements! Worse still, this is a silent error and the length seems to vary on every computer and R version – how puzzling!</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="at">along.with =</span> <span class="cn">NULL</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; integer(0)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">seq.int</span>(<span class="at">along.with =</span> <span class="cn">NULL</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3 4 5 6 ... [truncated] ... 101689002302752</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only the mainland and Tasmania, dropping the many tiny offshore</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># islands so the hexagon tiling reflects Australia's overall shape</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>aus <span class="ot">&lt;-</span> aus[<span class="fu">order</span>(<span class="fu">st_area</span>(aus), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_as_sf</span>(aus))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Simple sequences
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>seq.int()</code> is a faster, more primitive version of <code>seq()</code>.<br>
+It’s particularly nice for performance in R packages.</p>
+</div>
+</div>
+<p>The fix was simply making seven letters lowercase and adding a few unit tests, but the debugging process (and R Dev Day experience) is a story worth telling.</p>
+<section id="r-dev-days" class="level2">
+<h2 class="anchored" data-anchor-id="r-dev-days">R Dev Days</h2>
+<p>R Dev Days bring new and experienced R contributors together for a day of working directly on R itself. It’s a great opportunity to learn about R’s internals, and contribute to the language with the support of R core members and regular contributors. The day is structured around small teams working on selected issues from the <a href="https://github.com/orgs/r-devel/projects/12">project board</a>.</p>
+<p>This dev day was organised by <a href="https://github.com/hturner">Heather Turner</a> and <a href="https://github.com/EllaKaye">Ella Kaye</a>, who prepared the list of issues and guided us through setting up a development environment for R - a big thanks to them for making R core contributions approachable.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Want to contribute to R?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <a href="https://contributor.r-project.org/rdevguide">R Development Guide</a> is worth a read - it covers everything from setting up a build environment to the etiquette of submitting a patch.</p>
+</div>
+</div>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting started</h2>
+<p>Recruiting a small team was easy, <a href="https://github.com/bnaras">Balasubramanian Narasimhan</a> and <a href="https://github.com/HenrikBengtsson">Henrik Bengtsson</a> were immediately intrigued by the one-liner bug and we quickly started testing and theorising what the absurd sequence length could be. Alongside us was R-core developer <a href="https://github.com/ltierney">Luke Tierney</a>, who was just as surprised about the bug in a simple and well-used function (albeit the <code>along.with</code> argument is rarely used).</p>
+<p>With this being my first contribution to the R language, I wanted to take my time and learn the full process. The first step being reporting the bug on R’s bug tracker <a href="https://bugs.r-project.org/">Bugzilla</a>. After Heather set me up with an account, I submitted my first ‘problem report’ (<a href="https://bugs.r-project.org/show_bug.cgi?id=19100">PR #19100</a>) with a <a href="https://tidyverse.org/help/#reprex/">minimal reproducible example</a>.</p>
+<p>Next was to install R-devel so I’d have the right environment to test and troubleshoot the bug. I chose to install R-devel locally, following the <a href="https://contributor.r-project.org/rdevguide/chapters/getting_started.html">setup instructions</a> in the R Development Guide. This involved getting the latest R sources from <a href="https://svn.r-project.org/R/trunk/" class="uri">https://svn.r-project.org/R/trunk/</a>, installing build dependencies, and then building R with <code>make</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Quick start R-devel
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I also experimented with using the ready-to-go <a href="https://github.com/r-devel/r-dev-env">r-devel/r-dev-env</a> codespace, which quickly spins up a containerised R-devel build with VS Code in your browser (no local setup required).</p>
+<p>I think this is a great option for the occasional contributor, but I wanted to learn the full process of debugging, modifying and building R locally.</p>
+</div>
+</div>
+</section>
+<section id="debugging" class="level2">
+<h2 class="anchored" data-anchor-id="debugging">Debugging</h2>
+<p>With a development build of R 4.7.0 in hand, the next job was digging into the code of <code>seq.int()</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>seq.int</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (from, to, by, length.out, along.with, ...)  .Primitive("seq.int")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This function is an R ‘primitive’ - printing it doesn’t reveal any clues, since everything is implemented in C. In R’s source code, primitives like this are registered in <a href="https://github.com/wch/r-source/blob/e45c090cf82dd726dbfbc9218e14e5799120d8ad/src/main/names.c#L636"><code>names.c</code></a>, which allows us to find the name of its C function: <code>do_seq</code> from <a href="https://github.com/wch/r-source/blob/e45c090cf82dd726dbfbc9218e14e5799120d8ad/src/main/seq.c#L792-L802"><code>seq.c</code></a>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">  This is a primitive SPECIALSXP with internal argument matching, implementing</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">  seq.int(from, to, by, length.out, along.with, ...)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">  'along' has to be used on an unevaluated argument, and evalList</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">  tries to evaluate language objects.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="pp">#define FEPS </span><span class="fl">1e-10</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">/* to match seq.default */</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>attribute_hidden SEXP do_seq<span class="op">(</span>SEXP call<span class="op">,</span> SEXP op<span class="op">,</span> SEXP args<span class="op">,</span> SEXP rho<span class="op">)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">/* ... code implementing sequences ... */</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Looking into <code>do_seq()</code>, there’s only <a href="https://github.com/wch/r-source/blob/e45c090cf82dd726dbfbc9218e14e5799120d8ad/src/main/seq.c#L846-L850">one place</a> where <code>along.with</code> (called <code>along</code> internally) actually gets used:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>lout <span class="op">=</span> XLENGTH<span class="op">(</span>along<span class="op">);</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span><span class="op">(</span>One<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    ans <span class="op">=</span> lout <span class="op">?</span> seq_colon<span class="op">(</span><span class="fl">1.0</span><span class="op">,</span> <span class="op">(</span><span class="dt">double</span><span class="op">)</span>lout<span class="op">,</span> call<span class="op">)</span> <span class="op">:</span> allocVector<span class="op">(</span>INTSXP<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> done<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This narrowed our search to <code>XLENGTH()</code>, a macro that reads the length of an R object. When you pass <code>along.with = NULL</code>, <code>along</code> becomes <code>R_NilValue</code>, R’s internal representation of <code>NULL</code>. So if <code>length(NULL)</code> is 0, why isn’t <code>XLENGTH(R_NilValue)</code> also <code>0</code>?</p>
+</section>
+<section id="fixing-r" class="level2">
+<h2 class="anchored" data-anchor-id="fixing-r">Fixing R</h2>
+<p><code>XLENGTH()</code> eventually calls <code>STDVEC_LENGTH()</code>, a macro that reads an object’s length straight out of a fixed offset in R’s internal vector layout. Basically, it assumes the length field always lives at this exact spot in memory, so it just reads it directly. That works perfectly for actual vectors, because vectors <em>have</em> a length field at that offset. However non-vectors like <code>NULL</code> don’t have length fields (nor do functions, symbols, or environments). So <code>XLENGTH()</code> ends up reading whatever happens to be at that offset in memory, hence the large and inconsistent sequence lengths.</p>
+<p>Fortunately R already has a safer variant of <code>XLENGTH()</code> for this, <code>xlength()</code>. This function switches on the object’s type before reading anything, correctly returning <code>0</code> for <code>NULL</code> and sensible values for other non-vector types too. The fix was simply:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode diff code-with-copy"><code class="sourceCode diff"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="st">- lout = XLENGTH(along);</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">+ lout = xlength(along);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After adding a few unit tests (and running <code>make check-devel</code> to test them), I attached the patch to the bug report and it was ready for review. Less than two hours later, Luke Tierney had commited the patch to R-devel r90229 and ported it to R-patched r90230 (it helps that he was working right next to us the whole day answering our questions!).</p>
+</section>
+<section id="the-mystery-length" class="level2">
+<h2 class="anchored" data-anchor-id="the-mystery-length">The mystery length</h2>
+<p>So what exactly is sitting in memory at the usual length offset for <code>NULL</code>? We theorised (right from the start) that the huge sequence length could relate to a pointer or memory address. To confirm the theory, we used <code>.Internal(inspect(NULL))</code> to find more information about <code>NULL</code>’s internal representation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">.Internal</span>(<span class="fu">inspect</span>(<span class="cn">NULL</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; @5c7c50dc1d20 00 NILSXP g1c0 [MARK,REF(65535)]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>5c7c50dc1d20</code> is the memory address of <code>NULL</code> itself, printed in hex. Convert it to decimal, and it matches the exact length that <code>seq.int(along.with = NULL)</code> returned on that machine. That’s why the sequence length was huge and consistent across calls on the same machine, but different on other machines and R versions.</p>
+<p>This also answers why different objects (e.g.&nbsp;the <code>mean</code> function) return different lengths, since their memory addresses are different. It also explains why the length didn’t correspond to ‘round’ numbers like <code>2^32</code> or <code>2^64</code>, which would be more typical of an underflow.</p>
+<blockquote class="blockquote">
+<p>Good “detective work” – yes, and of course a bug to be addressed. Thank you Mitchell!<br>
+<em><a href="https://github.com/mmaechler">Martin Maechler</a></em></p>
+</blockquote>
+</section>
+<section id="wrapping-up" class="level2">
+<h2 class="anchored" data-anchor-id="wrapping-up">Wrapping up</h2>
+<p>Huge thanks to everyone at R Dev Day - it was a lot of fun and a great place to make my first contribution to R itself. Some issues only require R knowledge, while others involve delving into R’s C code, and there is always a need for translation, documentation, and testing. If you work with R and would like to get involved, you can find <a href="https://contributor.r-project.org/events/r-dev-days/#upcoming-events">upcoming R Dev Days</a> and apply to participate.</p>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/getAus-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="group.jpg" class="img-fluid figure-img" style="width:100.0%" alt="Group photo of R Dev Day 2026 participants in front of peg board wall with R logo and text 'Enjoy coding at R Dev Day'. There are 26 participants in the photo, with the author Mitchell O'Hara-Wild kneeling in the center of the front row."></p>
+<figcaption>Group photo of R Dev Day 2026 participants</figcaption>
 </figure>
 </div>
-</div>
-</div>
-<p>To convert this map into hexagonal coordinates, we can use <code>sf::st_make_grid()</code> to lay a hexagonal lattice over the map, keeping only the hexagons that overlap Australia’s outline. Through experimentation, a cellsize of 2 is roughly appropriate for the number of hexagons submitted to us. As it is a random process, some repetition may be needed to get the exact number of hexagons on the map with a nice layout.</p>
-<p>The mainland and Tasmania are gridded separately, testing overlap against a slightly eroded outline (<code>st_buffer(land, -0.3)</code>). This trims the hexagons that would otherwise only just clip the coastline, so the tiling doesn’t bridge the Bass Strait gap between the two.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hex_grid <span class="ot">&lt;-</span> aus <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(<span class="cf">function</span>(land) {</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    grid <span class="ot">&lt;-</span> <span class="fu">st_make_grid</span>(land, <span class="at">cellsize =</span> <span class="dv">2</span>, <span class="at">square =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    grid[<span class="fu">st_intersects</span>(grid, <span class="fu">st_buffer</span>(land, <span class="sc">-</span><span class="fl">0.3</span>), <span class="at">sparse =</span> <span class="cn">FALSE</span>)]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">%&gt;%</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reduce</span>(c)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>hex_points <span class="ot">&lt;-</span> <span class="fu">st_centroid</span>(hex_grid)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(<span class="fu">st_coordinates</span>(hex_points))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>#&gt; # A tibble: 229 × 2
-#&gt;        X     Y
-#&gt;    &lt;dbl&gt; &lt;dbl&gt;
-#&gt;  1  113. -25.3
-#&gt;  2  114. -27.0
-#&gt;  3  114. -23.5
-#&gt;  4  115. -32.2
-#&gt;  5  115. -28.7
-#&gt;  6  115. -25.3
-#&gt;  7  115. -21.8
-#&gt;  8  116. -33.9
-#&gt;  9  116. -30.5
-#&gt; 10  116. -27.0
-#&gt; # ℹ 219 more rows</code></pre>
-</div>
-</div>
-<p>To ensure that we are happy with the hexagon placements, we should view the hexagon grid on a map.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>aus_hex <span class="ot">&lt;-</span> hex_grid</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_as_sf</span>(aus)) <span class="sc">+</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> <span class="fu">st_as_sf</span>(aus_hex), <span class="at">colour =</span> <span class="st">"blue"</span>, <span class="at">fill =</span> <span class="cn">NA</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/plotHex-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Looks great, let’s make the map. Using the script from <a href="https://github.com/mitchelloharawild/hexwall">mitchelloharawild/hexwall</a>, we provide:</p>
-<ul>
-<li>A folder containing the hexagon images</li>
-<li>Desired pixel width of each hexagon</li>
-<li>Hexagon coordinates computed above</li>
-</ul>
-<p>If there are lot of stickers to position, or the resulting image dimension is large, this may take some time.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"hexwall.R"</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hexwall</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"hexstickers"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">sticker_width =</span> <span class="dv">500</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">coords =</span> <span class="fu">st_coordinates</span>(hex_points),</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sort_mode =</span> <span class="st">"colour"</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><img src="final.jpg" class="img-fluid"></p>
-<p>Beyond that, there were just a few finishing touches needed to add the useR! 2018 logo and text. Hope you all enjoy the 2018 useR! conference :)</p>
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{oharawild2018userhex,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{oharawild2026rdevday,
   author = {O’Hara-Wild, Mitchell},
-  title = {useR! 2018 Feature Wall},
-  date = {2018-07-11},
-  url = {https://mitchelloharawild.com/blog/user-2018-feature-wall/},
+  title = {Bugfixing {R} at {R} {Dev} {Day} 2026},
+  date = {2026-07-12},
+  url = {https://mitchelloharawild.com/blog/r-dev-day-2026/},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-oharawild2018userhex" class="csl-entry quarto-appendix-citeas" role="listitem">
-O’Hara-Wild, Mitchell. 2018. <span>“useR! 2018 Feature Wall.”</span>
-July 11, 2018. <a href="https://mitchelloharawild.com/blog/user-2018-feature-wall/">https://mitchelloharawild.com/blog/user-2018-feature-wall/</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-oharawild2026rdevday" class="csl-entry quarto-appendix-citeas" role="listitem">
+O’Hara-Wild, Mitchell. 2026. <span>“Bugfixing R at R Dev Day
+2026.”</span> July 12, 2026. <a href="https://mitchelloharawild.com/blog/r-dev-day-2026/">https://mitchelloharawild.com/blog/r-dev-day-2026/</a>.
 </div></div></section></div></main> <!-- /main -->
 <!-- plausible --> 
 <!-- Privacy-friendly analytics by Plausible -->
@@ -775,5 +784,4 @@ July 11, 2018. <a href="https://mitchelloharawild.com/blog/user-2018-feature-wal
 
 
 
-<script src="https://platform.twitter.com/widgets.js"></script>
 </body></html>

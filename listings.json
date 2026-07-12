@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/blog/r-dev-day-2026/index.html",
       "/blog/erx-cloudflare-dns/index.html",
       "/blog/ggplot2-package-design/index.html",
       "/blog/fable/index.html",

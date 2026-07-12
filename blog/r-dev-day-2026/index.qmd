@@ -1,0 +1,29 @@
+---
+title: "R Dev Day 2026: Fixing a bug in R"
+description: |
+  A short write-up of a bug I found and fixed in R during R Dev Day 2026.
+date: '2026-07-10'
+categories:
+  - r-devel
+tags:
+  - bugfix
+  - r-core
+image: 'featured.png'
+image-alt: ''
+citation:
+  id: oharawild2026rdevday
+---
+
+1. This week I made my first contribution to the R core language, fixing a bug in R that I found when making an R package a few months ago.
+2. The bug - `seq.int(length.out = NULL)` returns a massive sequence! More curious, the length of the sequence seems arbitrary -- what could this number mean?
+3. The fix? Making just 7 letters lowercase, changing `XLENGTH` to `xlength` - allow me to explain.
+
+* Fixing the bug - R dev day at useR! 2026: https://contributor.r-project.org/events/r-dev-days/
+* R dev day organised by https://github.com/hturner and https://github.com/EllaKaye - fantastic information for new contributors to R (R Development Guide: https://contributor.r-project.org/rdevguide)
+* A team effort - I was able to quickly intrigue https://github.com/bnaras and https://github.com/HenrikBengtsson with the simplicity and absurdity of the bug, and we worked on debugging together. We were also fortunate to have the expertise of R-core developer https://github.com/ltierney in identifying the best approach to fix the bug.
+* The first step - Bugzilla bug reporting https://bugs.r-project.org/show_bug.cgi?id=19100
+* Setting up R-devel for debugging: https://contributor.r-project.org/rdevguide/chapters/getting_started.html OR https://github.com/r-devel/r-dev-env (a codespace for testing R-devel in the browser with vscode).
+* Finding the root cause (down the rabbit hole image as todo), `seq.int` primitive is defined in `names.c` (https://github.com/wch/r-source/blob/e45c090cf82dd726dbfbc9218e14e5799120d8ad/src/main/names.c#L636) as a call to `do_seq`, which is found in `seq.c` (https://github.com/wch/r-source/blob/e45c090cf82dd726dbfbc9218e14e5799120d8ad/src/main/seq.c#L792-L802), in this function the only place where `along.with` (now called `along`) is used is here: https://github.com/wch/r-source/blob/e45c090cf82dd726dbfbc9218e14e5799120d8ad/src/main/seq.c#L846-L850.
+* Eureka! (struck gold image as todo). Looking into `XLENGTH()` closely, it eventually calls `STDVEC_LENGTH()` which reads the length field directly from R's internal vector layout. That works for vectors, but for non-vectors like NULL (and functions, symbols, environments, ...) the field doesn't exist, and the memory offset points to the object's address instead. This is why `seq.int(length.out = NULL)` returns a massive sequence -- it's reading the memory address of NULL as if it were a length.
+* A safer variant of `XLENGTH()` is `xlength()`, which uses a switch statement for the length of non-vectors, returning 0 for NULL.
+* Thanks to everyone at the R dev day, it was a lot of fun to poke around in R's internals and learn about the development process. I hope this post helps others who are interested in contributing to R, and I encourage anyone to get involved! Upcoming R dev days can be found here: https://contributor.r-project.org/events/r-dev-days/#upcoming-events
